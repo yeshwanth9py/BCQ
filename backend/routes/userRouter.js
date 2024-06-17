@@ -5,6 +5,7 @@ const User = require("../db/Schemas/User");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const cookieParser = require('cookie-parser');
+const auth = require("../authenticate");
 
 
 const userSchema = z.object({
@@ -73,5 +74,12 @@ userRouter.post("/login", async (req, res)=>{
         });
     }
 })
+
+
+userRouter.get("/users", auth, (req, res)=>{
+    return res.json({
+        "mama": "miya"
+    });
+});
 
 module.exports = userRouter;

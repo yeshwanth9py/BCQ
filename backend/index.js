@@ -6,8 +6,11 @@ require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 const connectdb = require("./db/connectdb");
 const userRouter = require("./routes/userRouter");
+const cookieParser = require("cookie-parser");
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 connectdb();
 
