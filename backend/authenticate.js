@@ -17,7 +17,8 @@ const auth = (req, res, next)=>{
 
     } catch(err){
         return res.status(400).json({
-            msg: "user is not authenticated"
+            msg: "user is not authenticated",
+            error: err
         })
     } 
 }

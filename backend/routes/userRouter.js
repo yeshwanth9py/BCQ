@@ -12,10 +12,14 @@ const userSchema = z.object({
     username: z.string().nonempty("Username is required").regex(/^[a-zA-Z0-9_]+$/, "Username must be alphanumeric and can include underscores"),
     password: z.string().min(8, "Password must be at least 8 characters long"),
     email: z.string().email("Invalid email address"),
+    confirmPassword: z.string().min(8, "Password must be at least 8 characters long"),
+    profilePic: z.string().optional()
 });
 
 userRouter.post("/signup", async (req, res)=>{
+    console.log("coming")
     const result = userSchema.safeParse(req.body);
+    console.log(result.error)
     if(!result.success){
         return res.status(400).json(result.error);
     }
