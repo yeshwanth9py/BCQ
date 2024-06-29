@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import Clock from 'react-clock';
 import 'react-clock/dist/Clock.css';
+import io from 'socket.io-client';
 
 export default function MyClock() {
   const [value, setValue] = useState(new Date());
@@ -12,9 +13,38 @@ export default function MyClock() {
   const [explanation, setExplanation] = useState("");
   const [exptimer, setExptimer] = useState(-1);
 
-  
-  
+
   const choiceRefs = useRef([]);
+
+  let socket=useMemo(()=>{
+    return io('http://localhost:5000');
+  },[])
+
+
+  useEffect(() => {
+
+    socket.on('connect', () => {
+      console.log('Connected to socket server');
+    })
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from socket server');
+    })
+
+    socket.on("readscore", (data) => {
+      console.log(data);
+    });
+    // Handle incoming socket events here
+    // Example:
+    // socket.on('someEvent', (data) => {
+    //   console.log(data);
+    // });
+
+    // Cleanup on unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   function decrementTime() {
     setSeconds((seconds) => {
@@ -49,6 +79,12 @@ export default function MyClock() {
     });
   }
 
+  function updatescore() {
+    setScore((prevScore) => prevScore + 1);
+    console.log("cominghetre");
+    socket.emit("updatescore", {score: score + 1, ccuid: localStorage.getItem("ccuid")});
+  }
+
   useEffect(() => {
     getmcqs();
   }, []);
@@ -71,13 +107,15 @@ export default function MyClock() {
     console.log(e.target.style.backgroundColor);
     if (res.data.correct) {
       e.target.className = "bg-green-500 rounded-lg m-4 cursor-pointer p-4";
-      setScore(score + 1);
+      updatescore();
+      
     } else {
       e.target.className = "bg-red-500 rounded-lg m-4 cursor-pointer p-4";
+      updatescore();
     }
 
     setExplanation(res.data.explanation);
-    runexptimer()
+    runexptimer();
     setTimeout(() => {
       getmcqs();
     }, 4000);
