@@ -35,10 +35,13 @@ const apiLimiter = rateLimit({
 connectdb();
 
 
-app.use('/api/', apiLimiter);
+// currently commenting the rate limiter, dont even know why have i used it :(
+
+// app.use('/api/', apiLimiter);
 app.use("/app/user",userRouter);
 app.use("/app/mcqs",mcqRouter);
 app.use("/app/rooms", roomRouter);
+
 
 
 // error handling middleware

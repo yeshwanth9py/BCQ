@@ -34,7 +34,7 @@ userRouter.post("/signup", async (req, res)=>{
             password: newpassword,
             email
         });
-        res.json(udetails);
+        res.json({uid: udetails._id});
     } catch(err){
         res.status(400).json({
             msg: "some error signing up"
@@ -71,7 +71,7 @@ userRouter.post("/login", async (req, res)=>{
             maxAge: 3600000, // 1 hour in milliseconds
         });
 
-        res.json({ message: 'Login successful' });
+        res.json({uid: udetails._id});
 
     } catch(err){
         res.status(400).json({

@@ -28,4 +28,21 @@ roomRouter.post("/create",auth, async (req, res) => {
     }
 });
 
+
+roomRouter.post("/join", auth, async (req, res) => {
+    const { roomId } = req.body;
+    const room = await Room.findById(roomId);
+    if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+    }
+    room.members.push(req.userd._id)
+    try {
+        await room.save();
+        return res.json({ message: "Room joined successfully", room });
+    } catch (err) {
+        console.error(err);
+        return res.status(400).json({ message: "Error joining room" });
+    }
+});
+
 module.exports = roomRouter

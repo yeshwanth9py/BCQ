@@ -26,15 +26,16 @@ const Login = () => {
         e.preventDefault();
         console.log(formdetails);
         axios.post("http://localhost:3000/app/user/login", formdetails).then((res) => {
-            setisloading(true);
             console.log(res);
-        }).then((res) => {
+            localStorage.setItem("ccuid", res.data.uid);
+            setisloading(true);   
+        }).then((res) =>{
             setTimeout(() => {
                 navigate("/home");
-            }, 1000);
+            }, 1000)
         }).catch((err) => {
             console.log(err);
-        })
+        });
 
     }
 
