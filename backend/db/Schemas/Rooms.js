@@ -12,6 +12,9 @@ const roomSchema = new mongoose.Schema({
   image: {
       type: String
   },
+  description: {
+      type: String
+  },
   members: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
