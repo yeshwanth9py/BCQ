@@ -5,6 +5,7 @@ import Home from './components/Home'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import ErrorComponent from './components/ErrorComponent'
+import Gamepage from './components/Gamepage'
 
 function App() {
   
@@ -17,6 +18,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/game/:id" element={<Gamepage />} />
         <Route path="*" element={<ErrorComponent />} />
       </Routes>
     </BrowserRouter>

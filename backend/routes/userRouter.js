@@ -12,7 +12,7 @@ const userSchema = z.object({
     username: z.string().nonempty("Username is required").regex(/^[a-zA-Z0-9_]+$/, "Username must be alphanumeric and can include underscores"),
     password: z.string().min(8, "Password must be at least 8 characters long"),
     email: z.string().email("Invalid email address"),
-    confirmPassword: z.string().min(8, "Password must be at least 8 characters long"),
+    confirmPassword: z.string().min(8, "Password must be at least 8 characters long").optional(),
     profilePic: z.string().optional()
 });
 
@@ -63,7 +63,6 @@ userRouter.post("/login", async (req, res)=>{
         const token = jwt.sign({username, email}, "SECRETKEY", {
             expiresIn: '1h',
         });
-
 
         res.cookie('token', token, {
             httpOnly: true, 

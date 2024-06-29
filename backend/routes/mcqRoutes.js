@@ -4,8 +4,11 @@ const auth = require("../authenticate");
 const mcqRouter = express.Router();
 
 
-mcqRouter.get("/all", async (req, res)=>{
 
+// const 
+
+
+mcqRouter.get("/all", async (req, res)=>{
     try{
         const allmcqs = await MCQ.find({});
         return res.json({
@@ -15,21 +18,43 @@ mcqRouter.get("/all", async (req, res)=>{
         console.error(err);
         return res.status(400).json(err);
     }
-    
 });
 
-mcqRouter.post("/", auth, async (req, res)=>{
+mcqRouter.get("/getrandom", async (req, res)=>{
+
+    const randommcq = await MCQ.aggregate([{$sample:{size:1}}]);
+    if(randommcq.length>0){
+        const {_id, question, options} = randommcq[0]
+        res.json({id:_id, question, options});
+    } else{
+        res.status(404).json({message: "no docs found"});
+    } 
+})
+
+mcqRouter.post("/checkans", async (req, res)=>{
+    console.log(req.body)
+    const resp = await MCQ.findById(req.body.id);
+    if(resp.correctAnswer === req.body.answer){
+
+        res.json({correct: true, explanation: resp.explanation});
+    } else{
+        res.json({correct: false, explanation: resp.explanation});
+    }
+});
+
+mcqRouter.post("/", /*auth, */ async (req, res)=>{
 
     try{
         const mcqs = await MCQ.create(req.body);
         res.json({
             msg: "mcqs have been added successfully"
         })
-    } catch(err) {
+    }catch(err) {
         res.status(400).json(err);
     }
 });
 
+// mcqRouter.post("/check/:")
 
 
 mcqRouter.put("/:id",  async (req, res)=>{
