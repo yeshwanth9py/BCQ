@@ -9,10 +9,22 @@ const connectdb = require("./db/connectdb");
 const userRouter = require("./routes/userRouter");
 const cookieParser = require("cookie-parser");
 const mcqRouter = require("./routes/mcqRoutes");
+const roomRouter = require("./routes/roomRoute");
 
-app.use(cors())
+app.use(cors(
+    {
+        origin: "http://localhost:5173",
+        credentials: true
+    }
+))
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(
+    {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: false
+    }
+));
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -26,6 +38,7 @@ connectdb();
 app.use('/api/', apiLimiter);
 app.use("/app/user",userRouter);
 app.use("/app/mcqs",mcqRouter);
+app.use("/app/rooms", roomRouter);
 
 
 // error handling middleware

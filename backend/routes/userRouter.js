@@ -66,6 +66,8 @@ userRouter.post("/login", async (req, res)=>{
 
         res.cookie('token', token, {
             httpOnly: true, 
+            secure: false, // true if your app is hosted on HTTPS
+            sameSite: 'Lax', // true if your site uses
             maxAge: 3600000, // 1 hour in milliseconds
         });
 
