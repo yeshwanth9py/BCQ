@@ -27,7 +27,11 @@ const Login = () => {
         console.log(formdetails);
         axios.post("http://localhost:3000/app/user/login", formdetails).then((res) => {
             console.log(res);
+
             localStorage.setItem("ccuid", res.data.uid);
+            localStorage.setItem("ccusername", res.data.username);
+            localStorage.setItem("ccavatar", res.data.profilePic);
+            
             setisloading(true);   
         }).then((res) =>{
             setTimeout(() => {
