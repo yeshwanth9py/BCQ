@@ -34,8 +34,10 @@ mcqRouter.get("/getrandom", async (req, res)=>{
 mcqRouter.post("/checkans", async (req, res)=>{
     console.log(req.body)
     const resp = await MCQ.findById(req.body.id);
-    if(resp.correctAnswer === req.body.answer){
-
+    console.log(resp)
+    
+    if(resp.correctAnswer == req.body.ans){
+        console.log("true");
         res.json({correct: true, explanation: resp.explanation});
     } else{
         res.json({correct: false, explanation: resp.explanation});

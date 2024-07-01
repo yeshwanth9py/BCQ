@@ -5,7 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { Button, CardActionArea, CardActions } from '@mui/material';
 
-export default function MultiActionAreaCard({room}) {
+export default function MultiActionAreaCard({room, joinRoom}) {
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea>
@@ -25,7 +25,7 @@ export default function MultiActionAreaCard({room}) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary">
+        <Button size="small" color="primary" onClick={() => joinRoom(room._id)}>
           Join Now
         </Button>
       </CardActions>

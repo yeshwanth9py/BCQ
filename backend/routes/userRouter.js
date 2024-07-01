@@ -32,7 +32,8 @@ userRouter.post("/signup", async (req, res)=>{
         const udetails = await User.create({
             username,
             password: newpassword,
-            email
+            email,
+            profilePic: req.body.profilePic
         });
         res.json({uid: udetails._id});
     } catch(err){
@@ -71,7 +72,7 @@ userRouter.post("/login", async (req, res)=>{
             maxAge: 3600000, // 1 hour in milliseconds
         });
 
-        res.json({uid: udetails._id});
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilePic});
 
     } catch(err){
         res.status(400).json({

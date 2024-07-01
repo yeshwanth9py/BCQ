@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SearchAppBar from './Searchbar';
 import MultiActionAreaCard from './CardRoom';
 import Sidebar from './Sidebar';
@@ -8,14 +8,20 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import BasicModal from './Home/Createmodel';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
 const Home = () => {
+
   const [showModal, setShowModal] = useState(false);
   const [rooms, setRooms] = useState([]);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
+  const navigate = useNavigate();
+
+  
 
   async function getrooms() {
     const allrooms = await axios.get("http://localhost:3000/app/rooms/all");
@@ -26,6 +32,15 @@ const Home = () => {
   useEffect(() => {
     getrooms();
   }, []);
+
+
+  function joinRoom(roomno){
+    console.log(roomno);
+
+    navigate(`/game/${roomno}`, { state: { roomno } });
+    
+  }
+
 
   return (
     <>
@@ -49,8 +64,8 @@ const Home = () => {
             </Button>
             <div className='m-10'>
               <h1>Join A Room</h1>
-              {rooms.map((room) => (
-                <MultiActionAreaCard room={room} />
+              {rooms.map((room, ind) => (
+                <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom}/>
               ))}
             </div>
           </div>

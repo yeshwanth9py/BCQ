@@ -14,8 +14,48 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-const allrooms = []
-const alluserscores = {}
+const allrooms = {}
+
+
+// {
+//     roomno1: {
+//         user1: {
+//             name: "username1",
+//             avatar:"",
+//             score: 0
+//         },
+//         user2:{
+//             name: "username2".
+//             avatar: "",
+//             score: 0
+//         }
+//     },
+//     roomno2: {
+//         user1: {
+//             name: "username1",
+//             avatar:"",
+//             score: 0
+//         },
+//         user2:{
+//             name: "username2".
+//             avatar: "",
+//             score: 0
+//         }
+//     }
+// }
+        
+let allwaitingrooms = {}
+
+// roomno:{
+//     user1:{
+//         name: "user1",
+//         avatar: ""
+//     },
+//     user2: {
+//         name: "user2",
+//         avatar:""
+//     }
+// }
 
 
 const io = socketIo(server, {
@@ -35,15 +75,55 @@ io.on("connection", (socket)=>{
         console.log("client disconnected"); 
     });
 
-    // socket.on("join", (data)=>{
-    //     allrooms.push(data);
-    //     console.log(allrooms);
-    // });
+    socket.on("joinroom", (data)=>{
+        allwaitingrooms[data.roomno] = {
+            ...allwaitingrooms[data.roomno],
+            [data.ccuid]: {
+                username: data.username,
+                avatar: data.avatar,
+            }
+        }
+        console.log(allwaitingrooms[data.roomno])
+        socket.emit("someonejoined", allwaitingrooms[data.roomno]);
+    });
+
+    socket.on("join", (data)=>{
+
+        allrooms[data.roomno] = {
+            ...allrooms[data.roomno],
+            [data.ccuid]: {
+                username: data.username,
+                avatar: data.avatar,
+                score: 0
+            }
+        };
+        console.log(data.ccuid, "has joined", data.roomno);
+        console.log(allrooms);
+
+        socket.join(data.roomno);
+        
+        console.log(allrooms);
+    });
 
     socket.on("updatescore", (data)=>{
-        alluserscores[data.ccuid] = data.score;
-        socket.broadcast.emit("readscore", data);
-        console.log(alluserscores);
+
+        // console.log(alluserscores[data.roomno]);
+
+        allrooms[data.roomno] = {
+            ...allrooms[data.roomno],
+            [data.ccuid]: {
+                ...allrooms[data.roomno][data.ccuid],
+                score: data.score
+            }
+        };
+
+
+        // socket.broadcast.emit("readscore", alluserscores[data.roomno]);
+
+        // socket.broadcast.to(data.roomno).emit("readscore", allrooms[data.roomno][data.ccuid]);
+        io.to(data.roomno).emit('readscore', allrooms[data.roomno]);
+
+        console.log(allrooms);
     });
 
 

@@ -1,55 +1,116 @@
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import axios from 'axios';
-import { useEffect, useState, useRef, useMemo } from 'react';
 import Clock from 'react-clock';
+import { useParams, useLocation } from "react-router-dom";
 import 'react-clock/dist/Clock.css';
 import io from 'socket.io-client';
+import { Grid, Card, CardContent, Typography, Avatar } from '@mui/material';
 
 export default function MyClock() {
-  const [value, setValue] = useState(new Date());
+
   const [minutes, setMinutes] = useState(1);
   const [seconds, setSeconds] = useState(0);
   const [score, setScore] = useState(0);
   const [questions, setQuestions] = useState({});
   const [explanation, setExplanation] = useState("");
   const [exptimer, setExptimer] = useState(-1);
-
+  const [otherScores, setOtherScores] = useState([]); // For other users' scores
 
   const choiceRefs = useRef([]);
 
-  let socket=useMemo(()=>{
-    return io('http://localhost:5000');
-  },[])
+
+
+  // const params = useParams();
+  const location = useLocation();
+  const { roomno } = location.state || {};
+
+  const socket = useMemo(() => io('http://localhost:5000'), []);
+
+  // console.log(params)
 
 
   useEffect(() => {
 
+
     socket.on('connect', () => {
-      console.log('Connected to socket server');
-    })
+      console.log('connected');
+
+      socket.emit('join', {
+        roomno: roomno,
+        username: localStorage.getItem("ccusername"),
+        ccuid: localStorage.getItem("ccuid"),
+        avatar: localStorage.getItem("ccavatar"),
+      });
+
+    });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from socket server');
-    })
+      console.log('disconnected');
+    });
+
+
+
+
+    console.log('Connected to socket game server', socket.id);
 
     socket.on("readscore", (data) => {
       console.log(data);
-    });
-    // Handle incoming socket events here
-    // Example:
-    // socket.on('someEvent', (data) => {
-    //   console.log(data);
-    // });
+      // for(let user of data){
 
-    // Cleanup on unmount
+      // }
+
+
+      let temp = []
+      for (let user of Object.keys(data)) {
+        temp.push({
+          user: data[user]
+        })
+      }
+
+      setOtherScores([...otherScores, ...temp]);
+    });
+
     return () => {
       socket.disconnect();
     };
+  }, [socket]);
+
+  useEffect(() => {
+    getmcqs();
   }, []);
 
+  useEffect(() => {
+    const id = setInterval(decrementTime, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  async function getmcqs() {
+    const allmcqs = await axios.get("http://localhost:3000/app/mcqs/getrandom");
+    setQuestions(allmcqs.data);
+    setExplanation("");
+    resetChoiceColors();
+  }
+
+  function resetChoiceColors() {
+    choiceRefs.current.forEach(ref => {
+      if (ref) {
+        ref.className = "bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4";
+      }
+    });
+  }
+
+  function updatescore() {
+    setScore(prevScore => {
+      const newScore = prevScore + 1;
+      socket.emit("updatescore", { score: newScore, ccuid: localStorage.getItem("ccuid"), roomno });
+      return newScore;
+    });
+  }
+
   function decrementTime() {
-    setSeconds((seconds) => {
+    setSeconds(seconds => {
       if (seconds === 0) {
-        setMinutes((minutes) => {
+        setMinutes(minutes => {
           if (minutes === 0) {
             console.log("game ended");
           } else {
@@ -63,57 +124,17 @@ export default function MyClock() {
     });
   }
 
-  async function getmcqs() {
-    const allmcqs = await axios.get("http://localhost:3000/app/mcqs/getrandom");
-    setQuestions(allmcqs.data);
-    setExplanation("");
-    resetChoiceColors();
-  }
-
-  function resetChoiceColors() {
-    choiceRefs.current.forEach(ref => {
-      if (ref) {
-        console.log(ref.style.backgroundColor);
-        ref.className = "bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4";
-      }
-    });
-  }
-
-  function updatescore() {
-    setScore((prevScore) => prevScore + 1);
-    console.log("cominghetre");
-    socket.emit("updatescore", {score: score + 1, ccuid: localStorage.getItem("ccuid")});
-  }
-
-  useEffect(() => {
-    getmcqs();
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(decrementTime, 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => setValue(new Date()), 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
   const check = async (e) => {
     let ans = e.target.textContent.slice(3);
-    const res = await axios.post("http://localhost:3000/app/mcqs/checkans", { id: questions.id, ans: ans });
-    console.log(e.target.style.backgroundColor);
+    console.log(ans, questions.id);
+    const res = await axios.post("http://localhost:3000/app/mcqs/checkans", { id: questions.id, ans });
+    console.log(res.data)
     if (res.data.correct) {
       e.target.className = "bg-green-500 rounded-lg m-4 cursor-pointer p-4";
       updatescore();
-      
     } else {
       e.target.className = "bg-red-500 rounded-lg m-4 cursor-pointer p-4";
-      updatescore();
     }
-
     setExplanation(res.data.explanation);
     runexptimer();
     setTimeout(() => {
@@ -123,9 +144,7 @@ export default function MyClock() {
 
   function runexptimer() {
     setExptimer(3);
-    const id = setInterval(() => {
-      setExptimer((prev) => prev - 1);
-    }, 1000);
+    const id = setInterval(() => setExptimer(prev => prev - 1), 1000);
     setTimeout(() => {
       setExptimer(-1);
       clearInterval(id);
@@ -135,32 +154,80 @@ export default function MyClock() {
   if (Object.keys(questions).length === 0) return <div>Loading...</div>;
 
   return (
-    <>
-      <div className="flex items-end flex-col mx-10 my-2 relative">
-        <Clock value={value} />
-      </div>
-      <p className='text-3xl text-center'>{minutes}:{seconds}</p>
-      <div className='flex justify-center flex-col items-center'>
-        {(Object.keys(questions).length > 0) && (
-          <>
-            <div className='font-bold text-4xl'>{questions.question}</div>
+    <Grid container spacing={3}>
+      {/* User Score */}
+      <Grid item xs={12} sm={4}>
+        <Card>
+          <CardContent>
+            <Typography variant="h4" color="primary">
+              Your Score: {score}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+
+
+
+      {/* Timer */}
+      <Grid item xs={12} sm={4} className="flex justify-center">
+        <Typography variant="h4">
+          {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+        </Typography>
+      </Grid>
+
+      {/* Question and Options */}
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5" className="font-bold text-4xl text-center">{questions.question}</Typography>
             <div>
               {questions.options.map((option, index) => (
                 <div
                   key={index}
                   ref={el => choiceRefs.current[index] = el}
-                  className='bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4'
+                  className="bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4"
                   onClick={check}
                 >
                   {String.fromCharCode(97 + index)}) {option}
                 </div>
               ))}
             </div>
-            <p>{explanation}</p>
-            {exptimer >= 0 && <p>{exptimer}</p>}
-          </>
-        )}
-      </div>
-    </>
+            <Typography variant="body1">{explanation}</Typography>
+            {exptimer >= 0 && <Typography variant="h6">{exptimer}</Typography>}
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* Other Users' Scores */}
+      <Grid item xs={12}>
+        <Card>
+          <CardContent>
+            <Typography variant="h5">Leaderboard</Typography>
+            {otherScores.map((use, index) => {
+              let temp3 = Object.keys(use)
+              for(let user of temp3){
+                return (
+                    <Grid container alignItems="center" key={index} spacing={2}>
+                      <Grid item>
+                        <Avatar src={use[user].avatar} alt={use[user].username} />
+                      </Grid>
+                      <Grid item xs>  
+                        <Typography variant="body1">{use[user].username}</Typography>
+                      </Grid>
+                      <Grid item>
+                        <Typography variant="h6" color="secondary">
+                          {use[user].score}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                      )
+                    }
+                  })}
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 }
+
+

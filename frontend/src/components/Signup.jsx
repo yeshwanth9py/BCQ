@@ -40,6 +40,8 @@ const Signup = () => {
         })
       }
       console.log(details);
+      localStorage.setItem("ccuid", res.data.uid);
+      setisloading(true);
       setTimeout(() => {
         navigate("/home");
       }, 3000);
