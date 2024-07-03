@@ -15,6 +15,12 @@ const roomSchema = new mongoose.Schema({
   description: {
       type: String
   },
+  Participants: {
+    type: Number
+  },
+  CreatedBy: {
+    type: String
+  },
   members: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

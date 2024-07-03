@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const cookieParser = require('cookie-parser');
 const auth = require("../authenticate");
+const  Profile  = require("../db/Schemas/Profile");
 
 
 const userSchema = z.object({
@@ -16,8 +17,20 @@ const userSchema = z.object({
     profilePic: z.string().optional()
 });
 
+
+userRouter.get("/", auth, async (req, res)=>{
+    try{
+        const userd = await Profile.findById({profile: req.userd.profile});
+        res.json(userd);
+    } catch(err){
+        console.error(err);
+        return res.status(400).json(err);
+    }
+});
+
 userRouter.post("/signup", async (req, res)=>{
     console.log("coming")
+    console.log(req.body);
     const result = userSchema.safeParse(req.body);
     console.log(result.error)
     if(!result.success){
@@ -29,12 +42,36 @@ userRouter.post("/signup", async (req, res)=>{
         const salt = await bcrypt.genSalt(10);
         let newpassword = await bcrypt.hash(password, salt);
 
+        const pdetails = await Profile.create({
+            username,
+            profilePic: req.body.profilePic,
+            bio:"",
+            followers:[],
+            following: [],
+            likes: [],
+            rank: "Noob",
+            email: email,
+            previousGames: [],
+        });
+
         const udetails = await User.create({
             username,
             password: newpassword,
             email,
-            profilePic: req.body.profilePic
+            profilePic: req.body.profilePic,
+            profile: pdetails._id
         });
+
+        const token = jwt.sign({username, email}, "SECRETKEY", {
+            expiresIn: '1h',
+        });
+        
+        res.cookie('token', token, {
+            httpOnly: true,
+            // sameSite: 'none',
+            secure: false  // Set to true in production for HTTPS
+        });
+
         res.json({uid: udetails._id});
     } catch(err){
         res.status(400).json({
@@ -44,8 +81,11 @@ userRouter.post("/signup", async (req, res)=>{
 });
 
 
+
+
 userRouter.post("/login", async (req, res)=>{
     const result = userSchema.safeParse(req.body);
+    console.log(req.body);
     if(!result.success){
         return res.status(400).json(result.error);
     }
@@ -68,11 +108,11 @@ userRouter.post("/login", async (req, res)=>{
         res.cookie('token', token, {
             httpOnly: true, 
             secure: false, // true if your app is hosted on HTTPS
-            sameSite: 'Lax', // true if your site uses
+            sameSite: 'lax', // true if your site uses
             maxAge: 3600000, // 1 hour in milliseconds
         });
 
-        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilePic});
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilePic, token: token});
 
     } catch(err){
         res.status(400).json({
@@ -86,6 +126,18 @@ userRouter.get("/users", auth, (req, res)=>{
     return res.json({
         "mama": "miya"
     });
+});
+
+
+userRouter.delete("/delete", auth, async (req, res)=>{
+    try{
+        const userd = await User.findByIdAndDelete(req.userd._id);
+        const profiled = await Profile.findByIdAndDelete({profile: userd._id});
+        res.json({msg: "deleted successfully"});
+    } catch(err){
+        console.error(err);
+        return res.status(400).json(err);
+    }
 });
 
 module.exports = userRouter;

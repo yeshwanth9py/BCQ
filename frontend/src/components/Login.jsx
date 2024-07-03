@@ -25,15 +25,15 @@ const Login = () => {
     const submitdetails = (e) => {
         e.preventDefault();
         console.log(formdetails);
-        axios.post("http://localhost:3000/app/user/login", formdetails).then((res) => {
+        axios.post("http://localhost:3000/app/user/login", formdetails, { withCredentials: true }).then((res) => {
             console.log(res);
 
             localStorage.setItem("ccuid", res.data.uid);
             localStorage.setItem("ccusername", res.data.username);
             localStorage.setItem("ccavatar", res.data.profilePic);
-            
-            setisloading(true);   
-        }).then((res) =>{
+
+            setisloading(true);
+        }).then((res) => {
             setTimeout(() => {
                 navigate("/home");
             }, 1000)
@@ -93,33 +93,33 @@ const Login = () => {
                                 </div>
 
                                 <div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="block text-lg font-medium leading-6 text-gray-900">
-                      Password
-                    </label>
-                  </div>
-                  <div className="mt-2">
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      required
-                      value={formdetails.password}
-                      onChange={(e) => setFormdetails({ ...formdetails, password: e.target.value })}
-                      className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                
+                                    <div className="flex items-center justify-between">
+                                        <label htmlFor="password" className="block text-lg font-medium leading-6 text-gray-900">
+                                            Password
+                                        </label>
+                                    </div>
+                                    <div className="mt-2">
+                                        <input
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            autoComplete="current-password"
+                                            required
+                                            value={formdetails.password}
+                                            onChange={(e) => setFormdetails({ ...formdetails, password: e.target.value })}
+                                            className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+
 
 
                                 </div>
-                                    <div className="text-sm">
-                                        <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500 text-lg">
-                                            Forgot password?
-                                        </a>
-                                    </div>
-                                
+                                <div className="text-sm">
+                                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500 text-lg">
+                                        Forgot password?
+                                    </a>
+                                </div>
+
 
 
                                 <div>

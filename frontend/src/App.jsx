@@ -7,6 +7,7 @@ import Signup from './components/Signup'
 import ErrorComponent from './components/ErrorComponent'
 import Gamepage from './components/Gamepage'
 import GameRoom from './components/GameRoom'
+import Profile2 from './components/Profile/Profile2.jsx'
 
 function App() {
   
@@ -19,7 +20,8 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="home/room/:id" element={<GameRoom/>}/>
+        <Route path="/home/room/:id" element={<GameRoom/>}/>
+        <Route path="/home/profile" element = {<Profile2/>}/>
         <Route path="/game/:id" element={<Gamepage />} />
         <Route path="*" element={<ErrorComponent />} />
       </Routes>

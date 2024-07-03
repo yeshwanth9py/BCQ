@@ -29,7 +29,7 @@ const Sidebar = () => {
   }, [])
 
   return (
-    <div>
+    <div className="h-screen" style={{backgroundColor:"rgb(155,41,211)"}}>
     <div className={cx("sidebar", { "sidebar-closed": !isOpen })}>
       <button className={"sidebar__button"} onClick={() => setIsOpen(!isOpen)}>
         <FontAwesomeIcon icon={faBars} />
@@ -52,6 +52,7 @@ const Sidebar = () => {
         ))}
       </ul>
     </div>
+    
     </div>
   );
 };

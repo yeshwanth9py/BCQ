@@ -15,8 +15,10 @@ roomRouter.post("/create",auth, async (req, res) => {
         name,
         image,
         description,
+        CreatedBy: req.userd.username
     });
-    room.members.push(req.userd._id)
+
+    // room.members.push(req.userd._id)
 
     console.log(room);
     try {  

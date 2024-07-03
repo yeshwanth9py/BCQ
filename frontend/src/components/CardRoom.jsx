@@ -17,7 +17,7 @@ export default function MultiActionAreaCard({room, joinRoom}) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {room.name}
+            {room.name} createdby:-{room.CreatedBy}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {room.description}

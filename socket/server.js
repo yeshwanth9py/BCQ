@@ -14,7 +14,7 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-const allrooms = {}
+const allrooms = {};
 
 
 // {
@@ -49,11 +49,11 @@ let allwaitingrooms = {}
 // roomno:{
 //     user1:{
 //         name: "user1",
-//         avatar: ""
+//         isReady: false
 //     },
 //     user2: {
 //         name: "user2",
-//         avatar:""
+//         isReady: false
 //     }
 // }
 
@@ -71,21 +71,57 @@ io.on("connection", (socket)=>{
 
     console.log("new client connected", socket.id);
 
-    socket.on("disconnect",()=>{
-        console.log("client disconnected"); 
+    socket.on("disconnect",(data)=>{
+        console.log("client disconnected");
     });
 
     socket.on("joinroom", (data)=>{
+        console.log(allwaitingrooms[data.roomno]);
+
         allwaitingrooms[data.roomno] = {
             ...allwaitingrooms[data.roomno],
             [data.ccuid]: {
                 username: data.username,
                 avatar: data.avatar,
+                isReady: false
+            }
+        };
+
+        socket.join(data.roomno);
+        io.to(data.roomno).emit("someonejoined", allwaitingrooms[data.roomno]);
+        // socket.to(data.roomno).emit("someonejoined", allwaitingrooms[data.roomno]);
+        // socket.emit("someonejoined", allwaitingrooms[data.roomno]);
+    });
+
+    socket.on("ready", (data)=>{
+        
+        allwaitingrooms[data.roomno] = {
+            ...allwaitingrooms[data.roomno],
+            [data.ccuid]: {
+                ...allwaitingrooms[data.roomno][data.ccuid],
+                isReady: true
             }
         }
-        console.log(allwaitingrooms[data.roomno])
-        socket.emit("someonejoined", allwaitingrooms[data.roomno]);
+
+        console.log(allwaitingrooms);
+        // io.to(data.roomno).emit("readyb", allwaitingrooms[data.roomno]);
+        io.to(data.roomno).emit("readyb", allwaitingrooms[data.roomno]);
     });
+
+    socket.on("cancelready", (data)=>{
+        allwaitingrooms[data.roomno] = {
+            ...allwaitingrooms[data.roomno],
+            [data.ccuid]: {
+                ...allwaitingrooms[data.roomno][data.ccuid],
+                isReady: false
+            }
+        }
+
+        io.to(data.roomno).emit("cancelb", allwaitingrooms[data.roomno]);
+
+    });
+
+    
 
     socket.on("join", (data)=>{
 
@@ -117,16 +153,33 @@ io.on("connection", (socket)=>{
             }
         };
 
-
+        io.to(data.roomno).emit("readscore", allrooms[data.roomno][data.ccuid]);
         // socket.broadcast.emit("readscore", alluserscores[data.roomno]);
 
         // socket.broadcast.to(data.roomno).emit("readscore", allrooms[data.roomno][data.ccuid]);
-        io.to(data.roomno).emit('readscore', allrooms[data.roomno]);
+        // io.to(data.roomno).emit('readscore', allrooms[data.roomno]);
 
         console.log(allrooms);
     });
 
+    // user-disc
 
+    socket.on("user-disconnect", (data)=>{
+        console.log(data);
+
+        // delete allrooms[data.roomno][data.ccuid];
+        delete allwaitingrooms[data.roomno][data.ccuid];
+        io.to(data.roomno).emit("someonejoined", allwaitingrooms[data.roomno]);
+
+        // io.to(data.roomno).emit("user-disc", data);
+
+        // io.to(data.roomno).emit('readscore', allrooms[data.roomno]);
+
+        console.log(allrooms);
+
+        
+
+    });
 
 });
 

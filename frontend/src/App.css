@@ -142,3 +142,28 @@ ul {
 .sidebar__icon {
   margin: 0 15px 0 0;
 }
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background: linear-gradient(135deg, #2962ff, #6badee, #00bfa5, #fbc02d, #ff4081);
+  background-size: 2400% 2400%;
+  animation: gradient 10s ease infinite;
+}
+
+

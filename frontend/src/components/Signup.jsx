@@ -25,6 +25,9 @@ const Signup = () => {
 
   async function uploadDetails(e) {
     e.preventDefault();
+    if(formdetails.profilePic === ""){
+      return
+    }
     console.log(formdetails);
     if (formdetails.password !== formdetails.confirmPassword) {
       console.log("not ame")
@@ -38,13 +41,18 @@ const Signup = () => {
         toast.success("Account created successfully!", {
           position: "bottom-right"
         })
+        console.log("details", details);
+        
+        localStorage.setItem("ccuid", details.data.uid);
+        localStorage.setItem("ccusername", details.data.username);
+        localStorage.setItem("ccavatar", details.data.profilePic);
+
+        setisloading(true);
+        setTimeout(() => {
+          navigate("/home");
+        }, 3000);
       }
-      console.log(details);
-      localStorage.setItem("ccuid", res.data.uid);
-      setisloading(true);
-      setTimeout(() => {
-        navigate("/home");
-      }, 3000);
+      
     } catch(err){
       console.log(err);
     }
@@ -140,7 +148,7 @@ const Signup = () => {
                 </div>
                 <FileUpload setFormdetails={setFormdetails} />
                 <div>
-                  <button type='submit'
+                  <button 
                     className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     Sign in
