@@ -20,9 +20,10 @@ export default function MyClock() {
 
 
 
-  // const params = useParams();
-  const location = useLocation();
-  const { roomno } = location.state || {};
+  const params = useParams();
+  // const location = useLocation();
+  // const { roomno } = location.state || {};
+  const roomno = params.roomno;
 
   const socket = useMemo(() => io('http://localhost:5000'), []);
 
@@ -45,11 +46,13 @@ export default function MyClock() {
     });
 
     socket.on('disconnect', () => {
+      socket.emit("user-disconnect", {
+        roomno: roomno,
+        username: localStorage.getItem("ccusername"),
+        ccuid: localStorage.getItem("ccuid"),
+      });
       console.log('disconnected');
     });
-
-
-
 
     console.log('Connected to socket game server', socket.id);
 
@@ -68,6 +71,11 @@ export default function MyClock() {
       }
 
       setOtherScores([...otherScores, ...temp]);
+    });
+
+    socket.on("user-disc", (data)=>{
+      console.log(data);
+      console.log(data.ccuid, "has disconnected", data.roomno);
     });
 
     return () => {

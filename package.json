@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "name": "bcq",
+  "description": "Battle Choice Question",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "dev": "concurrently \"npm run dev-frontend\" \"npm run dev-backend\" \"npm run dev-socket\"",
+    "dev-frontend": "cd frontend && npm run dev",
+    "dev-backend": "cd backend && node index.js",
+    "dev-socket": "cd socket && node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yeshwanth9py/BCQ.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yeshwanth9py/BCQ/issues"
+  },
+  "homepage": "https://github.com/yeshwanth9py/BCQ#readme"
+}

@@ -21,6 +21,7 @@ const BasicModal = ({ open, handleClose }) => {
     const [roomName, setRoomName] = useState('');
     const [roomDescription, setRoomDescription] = useState('');
     const [roomImage, setRoomImage] = useState(null);
+
     const [formdetails, setFormDetails] = useState(
         {
             name: "",

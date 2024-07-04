@@ -62,7 +62,7 @@ const FileUpload = ({setFormdetails}) => {
             ...formdetails,
             profilePic: downloadURL
           }));
-          console.log('File available at', downloadURL);
+          console.log('File available at', downloadURL);  
           // const sid = toast.success("Profile pic uploaded successfully!", {
           //   position: "bottom-right"
           // });
@@ -85,7 +85,7 @@ const FileUpload = ({setFormdetails}) => {
         Select file
         <VisuallyHiddenInput type="file" />
       </Button>
-      {file && !downloadURL && <button onClick={handleUpload}>Upload your profile pic</button>}
+      {file && !downloadURL && <button onClick={handleUpload}>Uploade your profile pic</button>}
       {downloadURL && <img src={downloadURL} alt="profile pic" width={100} height={100}/>}
       {(progress > 0 && progress < 100) && <div>Progress: {progress}%</div>}
       {/* {downloadURL && <a href={downloadURL} target="_blank" rel="noopener noreferrer">Download File</a>} */}

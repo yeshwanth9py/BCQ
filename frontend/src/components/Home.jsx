@@ -37,7 +37,7 @@ const Home = () => {
   function joinRoom(roomno){
     console.log(roomno);
 
-    navigate(`/game/${roomno}`, { state: { roomno } });
+    navigate(`/home/room/${roomno}`, { state: { roomno } });
     
   }
 

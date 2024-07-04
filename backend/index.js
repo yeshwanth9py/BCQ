@@ -10,6 +10,7 @@ const userRouter = require("./routes/userRouter");
 const cookieParser = require("cookie-parser");
 const mcqRouter = require("./routes/mcqRoutes");
 const roomRouter = require("./routes/roomRoute");
+connectdb();
 
 app.use(cors(
     {
@@ -21,10 +22,11 @@ app.use(express.json());
 app.use(cookieParser(
     {
         httpOnly: true,
-        sameSite: 'none',
         secure: false
     }
 ));
+
+app.use(express.json());
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -32,12 +34,12 @@ const apiLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 
-connectdb();
 
 
 // currently commenting the rate limiter, dont even know why have i used it :(
-
 // app.use('/api/', apiLimiter);
+
+
 app.use("/app/user",userRouter);
 app.use("/app/mcqs",mcqRouter);
 app.use("/app/rooms", roomRouter);
