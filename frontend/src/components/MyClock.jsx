@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import axios from 'axios';
 import Clock from 'react-clock';
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import 'react-clock/dist/Clock.css';
 import io from 'socket.io-client';
 import { Grid, Card, CardContent, Typography, Avatar } from '@mui/material';
@@ -23,7 +23,8 @@ export default function MyClock() {
   const params = useParams();
   // const location = useLocation();
   // const { roomno } = location.state || {};
-  const roomno = params.roomno;
+  const roomno = params.id;
+  const navigate = useNavigate();
 
   const socket = useMemo(() => io('http://localhost:5000'), []);
 
@@ -57,7 +58,7 @@ export default function MyClock() {
     console.log('Connected to socket game server', socket.id);
 
     socket.on("readscore", (data) => {
-      console.log(data);
+      console.log("someone scored:",data);
       // for(let user of data){
 
       // }
@@ -88,7 +89,7 @@ export default function MyClock() {
   }, []);
 
   useEffect(() => {
-    const id = setInterval(decrementTime, 1000);
+    const id = setInterval(decrementTime, 100);
     return () => clearInterval(id);
   }, []);
 
@@ -121,6 +122,7 @@ export default function MyClock() {
         setMinutes(minutes => {
           if (minutes === 0) {
             console.log("game ended");
+            navigate("/gameover/" + roomno);
           } else {
             return minutes - 1;
           }
