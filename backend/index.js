@@ -10,6 +10,8 @@ const userRouter = require("./routes/userRouter");
 const cookieParser = require("cookie-parser");
 const mcqRouter = require("./routes/mcqRoutes");
 const roomRouter = require("./routes/roomRoute");
+const gameStatsRouter = require("./routes/gameStatsRouter");
+const profileRouter = require("./routes/profileRoutes");
 connectdb();
 
 app.use(cors(
@@ -43,6 +45,8 @@ const apiLimiter = rateLimit({
 app.use("/app/user",userRouter);
 app.use("/app/mcqs",mcqRouter);
 app.use("/app/rooms", roomRouter);
+app.use("/app/gamestats", gameStatsRouter);
+app.use("/app/profile", profileRouter);
 
 
 

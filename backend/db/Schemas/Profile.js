@@ -37,6 +37,10 @@ const profileschema = new mongoose.Schema({
         highestScore: Number,
         totalGamesPlayed: Number
     },
+    previousGames:[{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Gamestats"
+        }],
     createdAt: {
         type: Date,
         default: Date.now

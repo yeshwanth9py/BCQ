@@ -85,7 +85,7 @@ const FileUpload = ({setFormdetails}) => {
         Select file
         <VisuallyHiddenInput type="file" />
       </Button>
-      {file && !downloadURL && <button onClick={handleUpload}>Uploade your profile pic</button>}
+      {file && !downloadURL && <div onClick={handleUpload}>Uploade your profile pic</div>}
       {downloadURL && <img src={downloadURL} alt="profile pic" width={100} height={100}/>}
       {(progress > 0 && progress < 100) && <div>Progress: {progress}%</div>}
       {/* {downloadURL && <a href={downloadURL} target="_blank" rel="noopener noreferrer">Download File</a>} */}

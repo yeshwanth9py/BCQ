@@ -15,6 +15,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import { useNavigate } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -57,6 +58,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar() {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -75,6 +77,28 @@ export default function PrimarySearchAppBar() {
     setAnchorEl(null);
     handleMobileMenuClose();
   };
+
+  const handleLogout = ()=>{
+    handleMenuClose();
+
+    localStorage.removeItem("ccuid");
+    localStorage.removeItem("ccusername");
+    localStorage.removeItem("ccavatar");
+
+    // setTimeout(() => {
+      
+      navigate("/login");
+    // }, 1000)
+    
+    
+  }
+
+  const profilepg = ()=>{
+    handleMenuClose();
+    // const uid = localStorage.getItem("ccuid");
+    const username = localStorage.getItem("ccusername");
+    navigate("/home/profile/"+username);
+  }
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
@@ -97,8 +121,8 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      <MenuItem onClick={profilepg}>My account</MenuItem>
     </Menu>
   );
 

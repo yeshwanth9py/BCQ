@@ -12,9 +12,12 @@ export default function MyClock() {
   const [seconds, setSeconds] = useState(0);
   const [score, setScore] = useState(0);
   const [questions, setQuestions] = useState({});
+  const [attempted, setAttempted] = useState(0);
+  const [correct, setCorrect] = useState(0);
   const [explanation, setExplanation] = useState("");
   const [exptimer, setExptimer] = useState(-1);
-  const [otherScores, setOtherScores] = useState([]); // For other users' scores
+  const [otherScores, setOtherScores] = useState([]); 
+
 
   const choiceRefs = useRef([]);
 
@@ -111,9 +114,14 @@ export default function MyClock() {
   function updatescore() {
     setScore(prevScore => {
       const newScore = prevScore + 1;
-      socket.emit("updatescore", { score: newScore, ccuid: localStorage.getItem("ccuid"), roomno });
+      setAttempted((prevAttempted )=> {
+        socket.emit("updatescore", { score: newScore, ccuid: localStorage.getItem("ccuid"), roomno, attempted: prevAttempted+1, correct: correct+1 });
+        return prevAttempted + 1
+      });
       return newScore;
     });
+
+    setCorrect(correct+1);
   }
 
   function decrementTime() {

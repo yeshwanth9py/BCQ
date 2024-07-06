@@ -26,6 +26,9 @@ const Signup = () => {
   async function uploadDetails(e) {
     e.preventDefault();
     if(formdetails.profilePic === ""){
+      toast.error("Pls upload a profile picture!", {
+        position: "bottom-right"
+      });
       return
     }
     console.log(formdetails);
@@ -46,6 +49,9 @@ const Signup = () => {
         localStorage.setItem("ccuid", details.data.uid);
         localStorage.setItem("ccusername", details.data.username);
         localStorage.setItem("ccavatar", details.data.profilePic);
+
+        
+    
 
         setisloading(true);
         setTimeout(() => {
@@ -149,7 +155,7 @@ const Signup = () => {
                 <FileUpload setFormdetails={setFormdetails} />
                 <div>
                   <button 
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={uploadDetails}
                   >
                     Sign in
                   </button>

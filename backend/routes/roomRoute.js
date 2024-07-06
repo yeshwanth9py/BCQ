@@ -10,12 +10,18 @@ roomRouter.get("/all", async (req, res) => {
 });
 
 roomRouter.post("/create",auth, async (req, res) => {
-    const {name, image, description} = req.body;
+    console.log(req.userd.username)
+    const {roomName, gameType, numPlayers,roomPassword, timeLimit, difficultyLevel, categories, rulesInstructions, isPrivate } = req.body;
+    
     const room = new Room({
-        name,
-        image,
-        description,
-        CreatedBy: req.userd.username
+        name: roomName,
+        description: rulesInstructions,
+        gameType: gameType,
+        numPlayers: numPlayers,
+        timeLimit: timeLimit,
+        difficultyLevel: difficultyLevel,
+        categories: categories,
+        CreatedBy: req.userd.username,
     });
 
     // room.members.push(req.userd._id)

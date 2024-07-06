@@ -22,7 +22,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home/room/:id" element={<GameRoom/>}/>
-        <Route path="/home/profile" element = {<Profile2/>}/>
+        <Route path="/home/profile/:id" element = {<Profile2/>}/>
         <Route path="/game/:id" element={<Gamepage />} />
         <Route path="/gameover/:id" element={<Gameover />} />
         <Route path="*" element={<ErrorComponent />} />
