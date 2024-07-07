@@ -9,6 +9,21 @@ const roomSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  gameType:{
+    type: String
+  },
+  numPlayers: {
+    type: Number
+  },
+  timeLimit: {
+    type: Number
+  },
+  difficultyLevel: {
+    type: String
+  },
+  categories: {
+    type: String
+  },
   image: {
       type: String
   },

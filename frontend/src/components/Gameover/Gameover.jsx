@@ -28,21 +28,24 @@ const Gameover = () => {
       <div className='text-3xl text-center -mt-28'>Gameover</div>
       <table className='text-center mx-auto mt-10'>
         <tr>
+          <th className='px-4 py-2 text-xl'>Room name</th>
           <th className='px-4 py-2 text-xl'>Rank</th>
           <th className='px-4 py-2 text-xl'>Username</th>
           <th className='px-4 py-2 text-xl'>Score</th>
           <th className='px-4 py-2 text-xl'>Attempted questions</th>
           <th className='px-4 py-2 text-xl'>No of right's</th>
           <th className='px-4 py-2 text-xl'>No of wrong's</th>
+          <th className='px-4 py-2 text-xl'>Time taken</th>
+          <th className='px-4 py-2 text-xl'>Date</th>
         </tr>
         {data && data.map((item, index) => (
           <tr key={index}>
             <td className='px-4 py-2'>{index + 1}</td>
             <td className='px-4 py-2'>{item.username}</td>
             <td className='px-4 py-2'>{item.score}</td>
-            <td className='px-4 py-2'>{0}</td>
-            <td className='px-4 py-2'>{0}</td>
-            <td className='px-4 py-2'>{0}</td>
+            <td className='px-4 py-2'>{item.attempted}</td>
+            <td className='px-4 py-2'>{item.score}</td>
+            <td className='px-4 py-2'>{item.attempted-item.score}</td>
           </tr>
         ))}
       </table>

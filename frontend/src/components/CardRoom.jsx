@@ -5,22 +5,31 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { Button, CardActionArea, CardActions } from '@mui/material';
 
-export default function MultiActionAreaCard({room, joinRoom}) {
+export default function MultiActionAreaCard({ room, joinRoom }) {
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345 }} onClick={() => joinRoom(room._id)}>
       <CardActionArea>
         <CardMedia
           component="img"
           height="140"
           image={"https://mui.com/static/images/cards/contemplative-reptile.jpg"}
-          alt="green iguana"
+          alt="Room Image"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {room.name} createdby:-{room.CreatedBy}
+            {room.name} (Created by: {room.CreatedBy})
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {room.description}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            Game Type: {room.gameType}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Number of Players: {room.numPlayers}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Time Limit: {room.timeLimit} seconds
           </Typography>
         </CardContent>
       </CardActionArea>

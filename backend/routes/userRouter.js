@@ -29,7 +29,6 @@ userRouter.get("/", auth, async (req, res)=>{
 });
 
 userRouter.post("/signup", async (req, res)=>{
-    console.log("coming")
     console.log(req.body);
     const result = userSchema.safeParse(req.body);
     console.log(result.error)
@@ -37,14 +36,16 @@ userRouter.post("/signup", async (req, res)=>{
         return res.status(400).json(result.error);
     }
     try{
-        const {username, password, email} = req.body;
+        console.log("coming")
+        const {username, password, email, profilePic} = req.body;
 
         const salt = await bcrypt.genSalt(10);
+
         let newpassword = await bcrypt.hash(password, salt);
 
         const pdetails = await Profile.create({
             username,
-            profilePic: req.body.profilePic,
+            profilePic: profilePic,
             bio:"",
             followers:[],
             following: [],
@@ -54,15 +55,19 @@ userRouter.post("/signup", async (req, res)=>{
             previousGames: [],
         });
 
+        console.log("profile", pdetails);
+
         const udetails = await User.create({
             username,
             password: newpassword,
             email,
             profilePic: req.body.profilePic,
-            profile: pdetails._id
-        });
+            profile: pdetails._id,
+        })
 
-        const token = jwt.sign({username, email}, "SECRETKEY", {
+        console.log("udetails", udetails);
+
+        const token = jwt.sign({username, email, profile, profilePic}, "SECRETKEY", {
             expiresIn: '1h',
         });
         
@@ -120,6 +125,15 @@ userRouter.post("/login", async (req, res)=>{
         });
     }
 })
+
+userRouter.get("/profile/:id", async (req, res)=>{
+    try{
+        const profile = await Profile.find({ username: req.params.id });
+        res.status(200).json(profile);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 userRouter.get("/users", auth, (req, res)=>{
