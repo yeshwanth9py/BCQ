@@ -36,14 +36,14 @@ const roomSchema = new mongoose.Schema({
   CreatedBy: {
     type: String
   },
-  members: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-  messages: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Message'
-  }]
+  // members: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'User'
+  // }],
+  // messages: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'Message'
+  // }]
 });
 
 const Room = mongoose.model('Room', roomSchema);

@@ -9,6 +9,7 @@ import Gamepage from './components/Gamepage'
 import GameRoom from './components/GameRoom'
 import Profile2 from './components/Profile/Profile2.jsx'
 import Gameover from './components/Gameover/Gameover.jsx'
+import Codepage from './components/Codepage.jsx'
 
 function App() {
   
@@ -25,6 +26,7 @@ function App() {
         <Route path="/home/profile/:id" element = {<Profile2/>}/>
         <Route path="/game/:id" element={<Gamepage />} />
         <Route path="/gameover/:id" element={<Gameover />} />
+        <Route path="/codecombat/:id" element={<Codepage />} />
         <Route path="*" element={<ErrorComponent />} />
       </Routes>
     </BrowserRouter>
