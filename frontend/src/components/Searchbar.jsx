@@ -10,12 +10,16 @@ import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { RiCloseLargeFill } from "react-icons/ri";
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { IoLogoSnapchat } from 'react-icons/io';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -57,10 +61,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar() {
+export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOptions, unreadnotifications }) {
   const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+
+  const [settingsopen, setSettingsopen] = useState(false);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -78,7 +84,7 @@ export default function PrimarySearchAppBar() {
     handleMobileMenuClose();
   };
 
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     handleMenuClose();
 
     localStorage.removeItem("ccuid");
@@ -86,18 +92,18 @@ export default function PrimarySearchAppBar() {
     localStorage.removeItem("ccavatar");
 
     // setTimeout(() => {
-      
-      navigate("/login");
+
+    navigate("/login");
     // }, 1000)
-    
-    
+
+
   }
 
-  const profilepg = ()=>{
+  const profilepg = () => {
     handleMenuClose();
     // const uid = localStorage.getItem("ccuid");
     const username = localStorage.getItem("ccusername");
-    navigate("/home/profile/"+username);
+    navigate("/home/profile/" + username);
   }
 
   const handleMobileMenuOpen = (event) => {
@@ -145,7 +151,7 @@ export default function PrimarySearchAppBar() {
     >
       <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={8} color="error">
+          <Badge badgeContent={4} color="error">
             <MailIcon />
           </Badge>
         </IconButton>
@@ -199,21 +205,49 @@ export default function PrimarySearchAppBar() {
           >
             CodeCombat
           </Typography>
-          
+
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
+              value={filter}
               inputProps={{ 'aria-label': 'search' }}
+              onChange={(e) => searchfilter(e.target.value)}
             />
           </Search>
+          {!settingsopen?<SettingsIcon className="relative cursor-pointer" 
+          onClick={()=>{
+            setSettingsopen(!settingsopen)
+          }} />:<RiCloseLargeFill className="relative cursor-pointer transform hover:rotate-180 transition-transform duration-1000 hover:scale-150" onClick={() => setSettingsopen(!settingsopen)}/>}
+          <br/>
+          {settingsopen && <div className="absolute top-12 left-96 bg-white text-gray-800 rounded-lg shadow-2xl p-4">
+          <h2 className="text-lg font-semibold mb-4">Search Settings</h2>
+          <div className="mb-2">
+            <input type="checkbox" id="name" className="mr-2 cursor-pointer" />
+            <label htmlFor="name" className='cursor-pointer' onChange={(e)=>{
+              setSearchOptions((searchOptions)=>{
+                return {...searchOptions, name: e.target.checked}
+                })
+            }}>Room name</label>
+          </div>
+          <div className="mb-2">
+            <input type="checkbox" id="description" className="mr-2 cursor-pointer" />
+            <label htmlFor="description" className='cursor-pointer'>Description</label>
+          </div>
+          <div className="mb-2">
+            <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" />
+            <label htmlFor="CreatedBy" className='cursor-pointer'>Created By</label>
+          </div>
+        </div>}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={0} color="error">
-                <MailIcon />
+              <Badge badgeContent={unreadnotifications} color="error">
+                {/* <div></div> */}
+                <MailIcon className='-z-10'/>
+                {/* <IoLogoSnapchat/> */}
               </Badge>
             </IconButton>
             <IconButton

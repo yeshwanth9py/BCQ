@@ -45,6 +45,9 @@ function setExpiry(roomno, collection) {
 
 io.on("connection", (socket) => {
     // console.log("new client connected", socket.id);
+    socket.on("sglobal", (data)=>{
+        socket.broadcast.emit("rglobal", data);
+    });
 
     socket.on("disconnect", () => {
         // console.log("client disconnected");

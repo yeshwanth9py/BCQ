@@ -12,6 +12,10 @@ const mcqRouter = require("./routes/mcqRoutes");
 const roomRouter = require("./routes/roomRoute");
 const gameStatsRouter = require("./routes/gameStatsRouter");
 const profileRouter = require("./routes/profileRoutes");
+const codeCombatRouter = require("./routes/codeCombatRouter");
+
+
+
 connectdb();
 
 app.use(cors(
@@ -28,7 +32,6 @@ app.use(cookieParser(
     }
 ));
 
-app.use(express.json());
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -47,6 +50,8 @@ app.use("/app/mcqs",mcqRouter);
 app.use("/app/rooms", roomRouter);
 app.use("/app/gamestats", gameStatsRouter);
 app.use("/app/profile", profileRouter);
+
+app.use("/app/codecombat", codeCombatRouter);
 
 
 

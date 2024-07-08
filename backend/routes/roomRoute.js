@@ -9,6 +9,20 @@ roomRouter.get("/all", async (req, res) => {
     return res.json({ rooms: allrooms });
 });
 
+roomRouter.get("/filter/:filter", async (req, res) => {
+    const filterVal = req.params.filter;
+
+    const filteredRooms = await Room.find({
+        $or: [
+          { name: { $regex: filterVal, $options: 'i' } }, // Case-insensitive match for username
+          { description: { $regex: filterVal, $options: 'i' } }, // Case-insensitive match for description
+          { CreatedBy: { $regex: filterVal, $options: 'i' } } // Case-insensitive match for createdBy
+        ]
+      });
+      
+    return res.json({ rooms: filteredRooms });
+});
+
 roomRouter.post("/create",auth, async (req, res) => {
     console.log(req.userd.username)
     const {roomName, gameType, numPlayers,roomPassword, timeLimit, difficultyLevel, categories, rulesInstructions, isPrivate } = req.body;
