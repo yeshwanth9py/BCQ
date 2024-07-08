@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import './App.css'
-import Home from './components/Home'
+import Home from './components/Home.jsx'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import ErrorComponent from './components/ErrorComponent'
@@ -13,7 +13,6 @@ import Codepage from './components/Codepage.jsx'
 
 function App() {
   
-
   return (
     
     <BrowserRouter>
