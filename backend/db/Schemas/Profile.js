@@ -41,6 +41,13 @@ const profileschema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Gamestats"
         }],
+    notifications: {
+        type: [{}],
+        // expires: '9d'
+    },
+    countunread: {
+        type: Number
+    },
     createdAt: {
         type: Date,
         default: Date.now

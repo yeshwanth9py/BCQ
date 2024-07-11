@@ -4,6 +4,7 @@ const Profile = require("../db/Schemas/Profile");
 const auth = require("../authenticate");
 const { z } = require('zod');
 const User = require("../db/Schemas/User");
+const Profilemodel = require("../db/Schemas/Profile");
 
 
 const updateProfileSchema = z.object({
@@ -51,8 +52,9 @@ profileRouter.get("/:pnm", async (req, res) => {
 profileRouter.post("/like", async (req, res) => {
     console.log("liked");
     try {
-        const { by, to } = req.body;
-        const profiled = await Profile.findOne({ username: to });
+        const { by, toname } = req.body;
+        const profiled = await Profile.findOne({ username: toname });
+        const to = profiled._id;
         if (profiled.likes.includes(by)) {
             const newarr = profiled.likes.filter((el) => {
                 return el !== by;
@@ -73,23 +75,61 @@ profileRouter.post("/like", async (req, res) => {
 
 profileRouter.post("/follow", async (req, res) => {
     try {
-        const { by, to } = req.body;
-        const profiled = await Profile.findOne({ username: to });
+        const { by, toname } = req.body;
+        const profiled = await Profile.findOne({ username: toname });
+        const to = profiled._id;   //to-uid
+
         if (profiled.followers.includes(by)) {
             const newarr = profiled.followers.filter((el) => {
                 return el !== by;
             });
             profiled.followers = newarr;
             await profiled.save();
-            return res.json({ followed: false, followersCount: profiled.followers.length });
+            
+            res.json({ followed: false, followersCount: profiled.followers.length });
+            
+            const byprofile = await Profile.findOneAndUpdate({_id: to},{$pull : {following: by }}, {new: true});
+            console.log("curfollo",byprofile);
         } else {
             profiled.followers.push(by);
             await profiled.save();
-            return res.status(200).json({ followed: true, followersCount: profiled.followers.length });
+            res.json({ followed: true, followersCount: profiled.followers.length });
+            const cursusd = await Profile.findOneAndUpdate({ _id: to }, { $push: { following: by } }, { new: true });
+            console.log("curfollo",cursusd);
         }
     } catch (err) {
         return res.json(err)
     }
+});
+
+
+profileRouter.post("/challenge", async (req, res) => {
+    const {byname, bypid, topid} = req.body;
+    const profiled = await Profile.findById(topid);
+    const challenge_time = Date.now();
+    // i  want to store last 10 notifications only
+
+    profiled.notifications.push({msg:`${byname} has challenged you!`, byname: byname, bypid: bypid, time: challenge_time, hasSeen: false, type: "challenge"});
+    if(profiled.notifications.length > 10){
+        profiled.notifications.shift();  //i am removig the oldest notification
+    }
+
+    profiled.countunread += 1;
+    await profiled.save();
+    res.json({profiled});
+});
+
+
+profileRouter.patch("/notifications", async (req, res) => {
+    console.log("notifications will be removed")
+    console.log(req.body)
+    const {username} = req.body;
+    const profiled = await Profilemodel.findOne({username: username}); 
+    console.log("profiledgot",profiled);
+    profiled.countunread = 0;
+    await profiled.save();
+    console.log("profiled",profiled);
+    res.json({profiled})
 });
 
 

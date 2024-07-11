@@ -53,6 +53,7 @@ userRouter.post("/signup", async (req, res)=>{
             rank: "Noob",
             email: email,
             previousGames: [],
+            notifications: [],
         });
 
         console.log("profile", pdetails);
@@ -67,7 +68,7 @@ userRouter.post("/signup", async (req, res)=>{
 
         console.log("udetails", udetails);
 
-        const token = jwt.sign({username, email, profile, profilePic}, "SECRETKEY", {
+        const token = jwt.sign({username, email}, "SECRETKEY", {
             expiresIn: '1h',
         });
         
@@ -77,7 +78,7 @@ userRouter.post("/signup", async (req, res)=>{
             secure: false  // Set to true in production for HTTPS
         });
 
-        res.json({uid: udetails._id});
+        res.json({uid: udetails._id, username: udetails.username, pid: pdetails._id, profilepic: udetails.profilepic});
     } catch(err){
         res.status(400).json({
             msg: "some error signing up"
@@ -117,7 +118,7 @@ userRouter.post("/login", async (req, res)=>{
             maxAge: 3600000, // 1 hour in milliseconds
         });
 
-        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilePic, token: token});
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile});
 
     } catch(err){
         res.status(400).json({

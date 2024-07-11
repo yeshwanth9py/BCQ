@@ -13,6 +13,8 @@ const auth = (req, res, next)=>{
 
         const payload = jwt.verify(token, "SECRETKEY");
 
+        // need to validate the profile
+
         req.userd = payload;
         next();
 

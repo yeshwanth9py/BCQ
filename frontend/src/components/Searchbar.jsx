@@ -19,7 +19,9 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { IoLogoSnapchat } from 'react-icons/io';
+import { IoLogoSnapchat, IoMdClose, IoMdCloseCircleOutline } from 'react-icons/io';
+import axios from 'axios';
+import { Card, CardContent } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -61,15 +63,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOptions, unreadnotifications }) {
+export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOptions, unreadnotifications, unreadchallenges, removenotification, challengeNotifications, showNotifications, setShowNotifications }) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
   const [settingsopen, setSettingsopen] = useState(false);
 
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -109,6 +113,9 @@ export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOpt
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+
+
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -217,36 +224,36 @@ export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOpt
               onChange={(e) => searchfilter(e.target.value)}
             />
           </Search>
-          {!settingsopen?<SettingsIcon className="relative cursor-pointer" 
-          onClick={()=>{
-            setSettingsopen(!settingsopen)
-          }} />:<RiCloseLargeFill className="relative cursor-pointer transform hover:rotate-180 transition-transform duration-1000 hover:scale-150" onClick={() => setSettingsopen(!settingsopen)}/>}
-          <br/>
+          {!settingsopen ? <SettingsIcon className="relative cursor-pointer"
+            onClick={() => {
+              setSettingsopen(!settingsopen)
+            }} /> : <RiCloseLargeFill className="relative cursor-pointer transform hover:rotate-180 transition-transform duration-1000 hover:scale-150" onClick={() => setSettingsopen(!settingsopen)} />}
+          <br />
           {settingsopen && <div className="absolute top-12 left-96 bg-white text-gray-800 rounded-lg shadow-2xl p-4">
-          <h2 className="text-lg font-semibold mb-4">Search Settings</h2>
-          <div className="mb-2">
-            <input type="checkbox" id="name" className="mr-2 cursor-pointer" />
-            <label htmlFor="name" className='cursor-pointer' onChange={(e)=>{
-              setSearchOptions((searchOptions)=>{
-                return {...searchOptions, name: e.target.checked}
+            <h2 className="text-lg font-semibold mb-4">Search Settings</h2>
+            <div className="mb-2">
+              <input type="checkbox" id="name" className="mr-2 cursor-pointer" />
+              <label htmlFor="name" className='cursor-pointer' onChange={(e) => {
+                setSearchOptions((searchOptions) => {
+                  return { ...searchOptions, name: e.target.checked }
                 })
-            }}>Room name</label>
-          </div>
-          <div className="mb-2">
-            <input type="checkbox" id="description" className="mr-2 cursor-pointer" />
-            <label htmlFor="description" className='cursor-pointer'>Description</label>
-          </div>
-          <div className="mb-2">
-            <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" />
-            <label htmlFor="CreatedBy" className='cursor-pointer'>Created By</label>
-          </div>
-        </div>}
+              }}>Room name</label>
+            </div>
+            <div className="mb-2">
+              <input type="checkbox" id="description" className="mr-2 cursor-pointer" />
+              <label htmlFor="description" className='cursor-pointer'>Description</label>
+            </div>
+            <div className="mb-2">
+              <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" />
+              <label htmlFor="CreatedBy" className='cursor-pointer'>Created By</label>
+            </div>
+          </div>}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <IconButton size="large" aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={unreadnotifications} color="error">
                 {/* <div></div> */}
-                <MailIcon className='-z-10'/>
+                <MailIcon className='-z-10' />
                 {/* <IoLogoSnapchat/> */}
               </Badge>
             </IconButton>
@@ -255,10 +262,28 @@ export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOpt
               aria-label="show 17 new notifications"
               color="inherit"
             >
-              <Badge badgeContent={0} color="error">
+              <Badge badgeContent={unreadchallenges} color="error" onClick={() => removenotification()}>
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            {showNotifications && (
+            <div className="absolute top-12 right-0 z-10 w-80 bg-gray-800 text-white rounded-lg shadow-lg">
+              <div className="flex justify-between items-center p-4 bg-gray-900 rounded-t-lg">
+                <h6 className="text-lg font-semibold">Notifications</h6>
+                <button onClick={() => setShowNotifications(!showNotifications)} className="text-white">
+                  <IoMdClose />
+                </button>
+              </div>
+              <div className="max-h-64 overflow-y-auto p-4">
+                {challengeNotifications.map((notification, index) => (
+                  <div key={index} className="p-3 my-2 bg-gray-700 rounded-lg hover:bg-indigo-500 cursor-pointer transition-all">
+                    <p className="text-sm">{notification.msg}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            )}
+
             <IconButton
               size="large"
               edge="end"

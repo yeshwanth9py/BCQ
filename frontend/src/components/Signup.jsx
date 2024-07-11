@@ -46,11 +46,10 @@ const Signup = () => {
         })
         console.log("details", details);
         
-        localStorage.setItem("ccuid", details.data.uid);
-        localStorage.setItem("ccusername", details.data.username);
-        localStorage.setItem("ccavatar", details.data.profilePic);
-
-        
+            localStorage.setItem("ccuid", details.data.uid);
+            localStorage.setItem("ccusername", details.data.username);
+            localStorage.setItem("ccavatar", details.data.profilePic);
+            localStorage.setItem("ccpid", details.data.pid);
     
 
         setisloading(true);

@@ -1,19 +1,28 @@
 import { Button } from '@mui/material';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
+import { useSocket } from '../../SocketContext/SocketContext';
+
+
 
 const Profile2 = () => {
   const [user, setUser] = useState({});
   const [profile, setProfile] = useState(null);
   const { id } = useParams();
   const [liked, setLiked] = useState(() => {
-    return localStorage.getItem(`${id}.liked`) === "true";
+    return localStorage.getItem(`${id}.liked`) == true;
   });
+
   const [follow, setFollow] = useState(() => {
-    return localStorage.getItem(`${id}.follow`) === "true";
-  })
+    return localStorage.getItem(`${id}.follow`) == true;
+  });
+
+  // const socket = useMemo(() => io('http://localhost:5000'), []);
+
+  const socket = useSocket();
+
   const [likeCount, setLikeCount] = useState(0);
   const [followCount, setFollowCount] = useState(0);
   const [animate, setAnimate] = useState(false);
@@ -21,12 +30,15 @@ const Profile2 = () => {
   const fetchUserStats = async () => {
     const response = await axios.get(`http://localhost:3000/app/gamestats/${id}`);
     const data = await response.data;
+    console.log("data", data)
     setUser(data);
   };
 
   const fetchProfile = async () => {
     const response = await axios.get(`http://localhost:3000/app/profile/${id}`);
     const data = await response.data;
+    console.log("profile", data)
+    
     setProfile(data[0]);
   };
 
@@ -50,25 +62,25 @@ const Profile2 = () => {
   }, [profile]);
 
   const sendLike = async () => {
-    // if(liked) {
-    //   setLiked(false);
-    //   setLikeCount(prevCount => prevCount - 1);
-    //   localStorage.removeItem(`${id}.liked`);
-    // } else{
-    //   setLiked(true);
-    //   setLikeCount(prevCount => prevCount + 1);
-    //   localStorage.setItem(`${id}.liked`, "true");
-    // }
+    if(liked) {
+      setLiked(false);
+      setLikeCount(prevCount => prevCount - 1);
+      localStorage.removeItem(`${id}.liked`);
+    } else{
+      setLiked(true);
+      setLikeCount(prevCount => prevCount + 1);
+      localStorage.setItem(`${id}.liked`, "true");
+    }
     try {
       const { data } = await axios.post("http://localhost:3000/app/profile/like", {
-        by: localStorage.getItem("ccuid"),
-        to: id
+        by: localStorage.getItem("ccpid"),
+        toname: id
       });
 
       if (data.liked) {
         setLiked(true);
         setLikeCount(data.likesCount);
-        localStorage.setItem(`${id}.liked`, "true");
+        localStorage.setItem(`${id}.liked`, true);
       } else {
         setLiked(false);
         setLikeCount(data.likesCount);
@@ -88,13 +100,13 @@ const Profile2 = () => {
   const sendfollow = async () => {
     try {
       const { data } = await axios.post("http://localhost:3000/app/profile/follow", {
-        by: localStorage.getItem("ccuid"),
-        to: id
+        by: localStorage.getItem("ccpid"),
+        toname: id
       });
       if(data.followed) {
         setFollow(true);
         setFollowCount(data.followersCount);
-        localStorage.setItem(`${id}.follow`, "true");
+        localStorage.setItem(`${id}.follow`, true);
       } else{
         setFollow(false);
         setFollowCount(data.followersCount);
@@ -105,6 +117,15 @@ const Profile2 = () => {
     }
   };
 
+  const challenge = async (topid)=>{
+    console.log("challenge", topid)
+    const res = await axios.post("http://localhost:3000/app/profile/challenge", {bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: topid});
+    console.log("res for challenge", res);
+    socket.emit("notification", ({bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"),topid:topid}))
+  }
+
+
+  
 
   return (
     <>
@@ -118,7 +139,7 @@ const Profile2 = () => {
                 className="w-32 h-32 rounded-full border-4 border-white"
               />
               <div className="ml-6">
-                <h1 className="text-3xl font-bold">{profile.username || "Username"}</h1>
+                <h1 className="text-3xl font-bold">{profile.username}{localStorage.getItem("ccusername") == profile.username ? " (You)" : ""}</h1>
                 <div className="flex items-center mt-2">
                   <p className="mr-4">Rank: {user.profile || "Guardian"}</p>
                   <p className="px-2 flex gap-1 items-center">
@@ -140,13 +161,13 @@ const Profile2 = () => {
                   <Button variant="contained" color="secondary" onClick={()=>sendfollow()}>
                     {follow ? "Unfollow" : "Follow"}
                   </Button>
-                  <Button variant="contained" color="error">Challenge</Button>
+                  <Button variant="contained" color="error" onClick={()=>challenge(profile._id)}>Challenge</Button>
                 </div>
               </div>
             </div>
             <div className="p-6 bg-gray-100">
               <div className="flex justify-between mb-4">
-                <p>{profile.followers.length || 0} followers</p>
+                <p>{followCount || 0} followers</p>
                 <p>{profile.following.length || 0} following</p>
               </div>
               <p className="mb-4">{profile.bio || "hi it's me"}</p>
