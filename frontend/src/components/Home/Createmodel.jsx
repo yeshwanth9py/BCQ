@@ -40,8 +40,10 @@ const BasicModal = ({ open, handleClose }) => {
         handleClose();
       }).catch((err) => {
         console.log(err);
+        alert("please login")
       });
     } catch (err) {
+      alert("please login")
       console.log(err);
     }
   };
