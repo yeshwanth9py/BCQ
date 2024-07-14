@@ -118,7 +118,7 @@ userRouter.post("/login", async (req, res)=>{
             maxAge: 3600000, // 1 hour in milliseconds
         });
 
-        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile});
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.udetails.profile._id});
 
     } catch(err){
         res.status(400).json({
