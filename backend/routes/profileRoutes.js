@@ -5,6 +5,7 @@ const auth = require("../authenticate");
 const { z } = require('zod');
 const User = require("../db/Schemas/User");
 const Profilemodel = require("../db/Schemas/Profile");
+const axios = require("axios");
 
 
 const updateProfileSchema = z.object({
@@ -104,19 +105,28 @@ profileRouter.post("/follow", async (req, res) => {
 
 
 profileRouter.post("/challenge", async (req, res) => {
-    const {byname, bypid, topid} = req.body;
-    const profiled = await Profile.findById(topid);
-    const challenge_time = Date.now();
-    // i  want to store last 10 notifications only
 
-    profiled.notifications.push({msg:`${byname} has challenged you!`, byname: byname, bypid: bypid, time: challenge_time, hasSeen: false, type: "challenge"});
-    if(profiled.notifications.length > 10){
-        profiled.notifications.shift();  //i am removig the oldest notification
+    try{
+        console.log("came2")
+        const {byname, bypid, topid, savedroom} = req.body;
+        
+        // const savedroom = await axios.post("http://localhost:3000/app/rooms/create", {...req.body.challengeData}, {withCredentials: true});
+        const profiled = await Profile.findById(topid);
+        const challenge_time = Date.now();
+        // i  want to store last 10 notifications only
+        console.log("came3 after saving room");
+        profiled.notifications.unshift({msg:`${byname} has challenged you!`, byname: byname, bypid: bypid, time: challenge_time, hasSeen: false, type: "challenge", profilepic: profiled.profilePic, roomid:savedroom._id});
+        if(profiled.notifications.length > 10){
+            profiled.notifications.shift();  //i am removig the oldest notification
+        }
+
+        profiled.countunread += 1;
+        await profiled.save();
+        res.json({profiled});
+    } catch(err){
+        console.error(err);
+        return res.status(400).json(err);
     }
-
-    profiled.countunread += 1;
-    await profiled.save();
-    res.json({profiled});
 });
 
 
