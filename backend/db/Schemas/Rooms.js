@@ -5,10 +5,6 @@ const roomSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
   gameType:{
     type: String
   },
@@ -36,10 +32,20 @@ const roomSchema = new mongoose.Schema({
   CreatedBy: {
     type: String
   },
-  // members: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'User'
-  // }],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    index: { expires: '10m' } 
+  },
+  members: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  no_of_ready:{
+    type: Number,
+    default: 0
+  }
+  
   // messages: [{
   //   type: mongoose.Schema.Types.ObjectId,
   //   ref: 'Message'
