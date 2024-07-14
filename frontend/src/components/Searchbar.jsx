@@ -63,7 +63,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOptions, unreadnotifications, unreadchallenges, removenotification, challengeNotifications, showNotifications, setShowNotifications }) {
+export default function PrimarySearchAppBar({ searchfilter, filter,searchOptions, setSearchOptions, unreadnotifications, unreadchallenges, removenotification, challengeNotifications, showNotifications, setShowNotifications, setSearchSubmit }) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -134,8 +134,8 @@ export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOpt
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
       <MenuItem onClick={profilepg}>My account</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </Menu>
   );
 
@@ -230,23 +230,37 @@ export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOpt
             }} /> : <RiCloseLargeFill className="relative cursor-pointer transform hover:rotate-180 transition-transform duration-1000 hover:scale-150" onClick={() => setSettingsopen(!settingsopen)} />}
           <br />
           {settingsopen && <div className="absolute top-12 left-96 bg-white text-gray-800 rounded-lg shadow-2xl p-4">
-            <h2 className="text-lg font-semibold mb-4">Search Settings</h2>
+            <h2 className="text-lg font-semibold mb-1 text-center">Search by</h2>
             <div className="mb-2">
-              <input type="checkbox" id="name" className="mr-2 cursor-pointer" />
-              <label htmlFor="name" className='cursor-pointer' onChange={(e) => {
+              <input type="checkbox" id="name" className="mr-2 cursor-pointer" checked={searchOptions.name} onChange={(e) => {
+                console.log(e.target.checked);
                 setSearchOptions((searchOptions) => {
                   return { ...searchOptions, name: e.target.checked }
                 })
-              }}>Room name</label>
+              }}/>
+              <label htmlFor="name" className='cursor-pointer'>Room name</label>
             </div>
             <div className="mb-2">
-              <input type="checkbox" id="description" className="mr-2 cursor-pointer" />
+              <input type="checkbox" id="description" className="mr-2 cursor-pointer" checked={searchOptions.description} onChange={(e)=>{
+                setSearchOptions((searchOptions) => {
+                  return { ...searchOptions, description: e.target.checked }
+                })
+              }}/>
               <label htmlFor="description" className='cursor-pointer'>Description</label>
             </div>
             <div className="mb-2">
-              <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" />
+              <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" checked={searchOptions.CreatedBy} onChange={(e)=>{
+                setSearchOptions((searchOptions) => {
+                  return { ...searchOptions, CreatedBy: e.target.checked }
+                })
+              }}/>
               <label htmlFor="CreatedBy" className='cursor-pointer'>Created By</label>
             </div>
+            <div className='text-center'><button className="bg-gray-800 text-white rounded-lg px-3 py-2 text-sm"
+             onClick={() => {
+              setSearchSubmit((p)=>!p);
+              setSettingsopen(!settingsopen);
+             }}>Apply</button></div>
           </div>}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -267,22 +281,32 @@ export default function PrimarySearchAppBar({ searchfilter, filter, setSearchOpt
               </Badge>
             </IconButton>
             {showNotifications && (
-            <div className="absolute top-12 right-0 z-10 w-80 bg-gray-800 text-white rounded-lg shadow-lg">
-              <div className="flex justify-between items-center p-4 bg-gray-900 rounded-t-lg">
-                <h6 className="text-lg font-semibold">Notifications</h6>
-                <button onClick={() => setShowNotifications(!showNotifications)} className="text-white">
-                  <IoMdClose />
-                </button>
+              <div className="absolute top-12 right-0 z-10 w-80 bg-gray-800 text-white rounded-lg shadow-lg">
+                <div className="flex justify-between items-center p-4 bg-gray-900 rounded-t-lg">
+                  <h6 className="text-lg font-semibold">Notifications</h6>
+                  <button onClick={() => setShowNotifications(!showNotifications)} className="text-white">
+                    <IoMdClose />
+                  </button>
+                </div>
+                <div className="max-h-64 overflow-y-auto p-4">
+                  {challengeNotifications.length === 0 && (
+                    <p className="text-sm text-center">Nothing here :(</p>
+                  )}
+                  {challengeNotifications.map((notification, index) => (
+                    <div key={index} className="p-3 my-2 bg-gray-700 rounded-lg hover:bg-indigo-500 cursor-pointer transition-all flex items-center space-x-3">
+                      <img src={notification.profilepic} className="w-10 h-10 rounded-full" alt="profile" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{notification.msg}</p>
+                        <p className="text-xs text-gray-400">{new Date(notification.time).toLocaleString()}</p>
+                      </div>
+                      {console.log(notification)}
+                      <button className="text-sm bg-green-600 rounded-lg px-3 py-1 hover:bg-green-700" onClick={()=>navigate("/home/room/" + notification.roomid)}>Accept</button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="max-h-64 overflow-y-auto p-4">
-                {challengeNotifications.map((notification, index) => (
-                  <div key={index} className="p-3 my-2 bg-gray-700 rounded-lg hover:bg-indigo-500 cursor-pointer transition-all">
-                    <p className="text-sm">{notification.msg}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            )}
+            )
+            }
 
             <IconButton
               size="large"
