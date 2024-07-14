@@ -147,7 +147,7 @@ const GameRoom = () => {
       )}
 
       <div className='absolute bottom-7 left-7 flex flex-col w-1/3'>
-        <div className='w-full bg-indigo-950 h-5 rounded text-right'>
+        <div className='w-full bg-indigo-950 h-5 rounded text-right cursor-pointer' onClick={()=>setChatExpanded(!chatExpanded)}>
           <ArrowDropUpIcon sx={{ color: pink[500] }} fontSize="large" className={`hover:scale-150 relative bottom-2 cursor-pointer ${chatExpanded ? 'rotate-180' : ''}`}  onClick={()=>setChatExpanded(!chatExpanded)} /> 
         </div>
         {chatExpanded && messages.length > 0 && (

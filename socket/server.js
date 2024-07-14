@@ -4,19 +4,22 @@ const app = express();
 const cors = require("cors");
 const socketIo = require('socket.io');
 
+
 const axios = require("axios");
-// const GameStats = require("../backend/db/Schemas/Gamestats");
-// const User = require("../backend/db/Schemas/User");
-// const Profilemodel = require("../backend/db/Schemas/Profile");
+
 
 const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
 
+
+
+
 const allrooms = {};
 const allwaitingrooms = {};
 const toi = {};
+const onlineusers = {};
 
 const io = socketIo(server, {
     cors: {
@@ -27,6 +30,8 @@ const io = socketIo(server, {
 
 const DATA_EXPIRY_TIME = 10*1000; // 10 SECONDS
 let tid;
+
+
 function setExpiry(roomno, collection) {
     console.log("will be storing in 3 mins", allrooms[roomno]);
     clearTimeout(tid);
@@ -44,13 +49,31 @@ function setExpiry(roomno, collection) {
 }
 
 io.on("connection", (socket) => {
+    
+    console.log("successfully started");
+
+    socket.on("online", (data) => {
+        console.log("data",data)
+        const userKey =`user:${data.uid}`;
+        onlineusers[userKey] = {socketid: socket.id};
+        console.log(onlineusers);
+    });
+    
+
+
+    
+    // io.emit('online', data);
+    
+
+    // socket.broadcast.emit("someone_online", data);
+    
     // console.log("new client connected", socket.id);
     socket.on("sglobal", (data)=>{
         socket.broadcast.emit("rglobal", data);
     });
 
     socket.on("disconnect", () => {
-        // console.log("client disconnected");
+        console.log("client disconnected");
     });
 
     socket.on("joinroom", (data) => {
@@ -62,7 +85,6 @@ io.on("connection", (socket) => {
                 username: data.username,
                 avatar: data.avatar,
                 isReady: false,
-
             }
         };
 
@@ -144,18 +166,38 @@ io.on("connection", (socket) => {
         // console.log(allrooms);
     });
 
+    socket.on('notification', (data) => {
+        console.log("notification received", data);
+        
+        console.log(`user:${data.topid}` in onlineusers)
+        if(`user:${data.topid}` in onlineusers) {
+            io.to(onlineusers[`user:${data.topid}`].socketid).emit('gotnotification', data);
+        }
+    });
+      
+
     socket.on("user-disconnect", (data) => {
         // console.log(data);
-
         if (data.roomno in allwaitingrooms && data.ccuid in allwaitingrooms[data.roomno]) {
             delete allwaitingrooms[data.roomno][data.ccuid];
             io.to(data.roomno).emit("someonejoined", allwaitingrooms[data.roomno]);
         }
 
-        // console.log("allrooms", allrooms);
-
+        
+        // io.emit('offline', data);
+        
     });
+
+    socket.on("offline", (data) => {
+        // console.log(data);
+        delete onlineusers[data.uid];
+        console.log("some one went ofline",onlineusers);
+    });
+
+    
 });
+
+    
 
 const PORT = 5000;
 

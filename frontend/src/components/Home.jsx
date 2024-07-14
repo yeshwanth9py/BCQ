@@ -13,12 +13,20 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import SidebarChat from './Globalchat';
+import { useSocket } from '../SocketContext/SocketContext';
+
+
+// const socket =  io('http://localhost:5000');
+
+
+
 
 const Home = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState('');
-  const socket = useMemo(() => io('http://localhost:5000'), []);
+  // const socket = useMemo(() => io('http://localhost:5000'), []);
+  const socket = useSocket();
 
   const [searchOptions, setSearchOptions] = useState({
     CreatedBy: true,
@@ -35,7 +43,15 @@ const Home = () => {
 
   const [unreadnotifications, setUnreadnotifications] = useState(0);
 
+
+  const [challengeNotifications, setChallengeNotifications] = useState([]);
+  const [unreadchallenges, setUnreadchallenges] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);  
+  // const [notifications, searchNotifications] = useState([]);
+
   const navigate = useNavigate();
+
+  
 
   const handleSendMessage = (message) => {
     console.log(message)
@@ -61,12 +77,39 @@ const Home = () => {
     }
   }
 
+  async function fetchprofile(){
+    const response = await axios.get(`http://localhost:3000/app/profile/${localStorage.getItem("ccusername")}`);
+    const data = await response.data;
+    console.log("profile",data[0]);
+    // setMessages(data[0].messages);
+    setChallengeNotifications([...data[0].notifications]);
+    setUnreadchallenges(data[0].countunread);
+  }
+
+
+  // useEffect(()=>{
+  //   // fetchprofile();
+  //   for(let i=0; i<challengeNotifications.length; i++){
+  //     if(!challengeNotifications[i].hasSeen){
+  //       setUnreadchallenges((unreadchallenges)=>unreadchallenges+1);
+  //     }
+  //   }
+  // }, [challengeNotifications])
+
+
+  useEffect(()=>{
+    fetchprofile();
+  },[])
   useEffect(() => {
     getrooms(filter);
   }, [filter]);
 
 
   useEffect(()=>{
+    
+    socket.emit("online", ({ uid: localStorage.getItem("ccpid") }));
+    
+
     socket.on('rglobal', (data) => {
       console.log(data);
 
@@ -77,7 +120,21 @@ const Home = () => {
       setMessages((messages)=>{
         return [...messages, { text: data.text, sender: data.sender, timestamp: data.timestamp }];
       })
-    })
+    });
+
+    socket.on("gotnotification", (data) => {
+
+      // alert("got notification");
+      setUnreadchallenges((unreadchallenges)=>{
+        return unreadchallenges+1
+      })
+      console.log(data);
+    });
+
+    return ()=>{
+      socket.emit("offline", ({ uid: localStorage.getItem("ccpid") }));
+    }
+
   },[])
 
 
@@ -88,6 +145,17 @@ const Home = () => {
     
   }
 
+  async function removenotification(){
+    setUnreadchallenges(0);
+    setShowNotifications(!showNotifications);
+    // if(unreadchallenges>0){
+      console.log(localStorage.getItem("ccusername"));
+      const updatedp = await axios.patch("http://localhost:3000/app/profile/notifications", { username: localStorage.getItem("ccusername") });
+      console.log("updated ", updatedp);
+    // }
+   
+  }
+
 
   return (
     <>
@@ -96,10 +164,9 @@ const Home = () => {
         <div>
           <Sidebar />
         </div>
-
         <div className='w-full'>
           <div>
-            <SearchAppBar searchfilter={setFilter} filter={filter} setSearchOptions={setSearchOptions} unreadnotifications={unreadnotifications}/>
+            <SearchAppBar searchfilter={setFilter} filter={filter} setSearchOptions={setSearchOptions} unreadnotifications={unreadnotifications} unreadchallenges={unreadchallenges} setUnreadchallenges={setUnreadchallenges} removenotification={removenotification} challengeNotifications={challengeNotifications} showNotifications={showNotifications} setShowNotifications={setShowNotifications}/>
             <Button
               variant="contained"
               color="success"
@@ -126,3 +193,6 @@ const Home = () => {
 }
 
 export default Home;
+
+
+

@@ -13,7 +13,7 @@ const Usercomponent = ({ ud, no }) => {
       <div className='flex flex-col'>
         <p className="text-gray-200 text-3xl">P{no}</p>
         <img src={pp} className='rounded-full w-40' />
-        <p className='text-center text-gray-300 text-2xl relative right-1'>{ud.username}</p>
+        <p className='text-center text-gray-300 text-2xl relative right-1'>{ud.username==localStorage.getItem("ccusername") ? "You" : ud.username}</p>
         <Checkbox
           {...label}
           checked={ud.isReady}
