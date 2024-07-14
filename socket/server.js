@@ -28,19 +28,20 @@ const io = socketIo(server, {
     }
 });
 
-const DATA_EXPIRY_TIME = 10*1000; // 10 SECONDS
+const DATA_EXPIRY_TIME = 60*1000; // 10 SECONDS
 let tid;
 
 
 function setExpiry(roomno, collection) {
-    console.log("will be storing in 3 mins", allrooms[roomno]);
+    console.log("will be storing in 1 min", allrooms[roomno]);
     clearTimeout(tid);
     tid = setTimeout(async () => {
         if (collection === "allrooms" && allrooms[roomno]) {
-            console.log("is getting saved...");
-            await axios.post("http://localhost:3000/app/gamestats", { toi: toi[roomno], roomno: roomno, data: allrooms[roomno] });
+            console.log("is getting saved...", allrooms[roomno]);
+            axios.post("http://localhost:3000/app/gamestats", { toi: toi[roomno], roomno: roomno, data: allrooms[roomno], gametype:"MCQ Type" });
             delete allrooms[roomno];
-            setExpiry(roomno, "allwaitingrooms");
+            delete allwaitingrooms[roomno];
+            console.log("game stats saved successfully") 
         } else if (collection === "allwaitingrooms" && roomno in Object.keys(allwaitingrooms)) {
             delete allwaitingrooms[roomno];
         }
@@ -87,6 +88,7 @@ io.on("connection", (socket) => {
                 isReady: false,
             }
         };
+        
 
         
 
@@ -139,6 +141,7 @@ io.on("connection", (socket) => {
                 correct: 0
             }
         };
+        console.log("allwaitingrooms some one joined", allwaitingrooms[data.roomno]);
 
         toi[data.roomno] = Date.now();
     

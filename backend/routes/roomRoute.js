@@ -9,7 +9,7 @@ roomRouter.get("/all", async (req, res) => {
     return res.json({ rooms: allrooms });
 });
 
-roomRouter.get("/filter/:filter", async (req, res) => {
+roomRouter.get("/filter/:filter",auth, async (req, res) => {
     const filterVal = req.params.filter;
 
     const filteredRooms = await Room.find({

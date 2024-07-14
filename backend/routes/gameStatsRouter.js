@@ -25,12 +25,36 @@ gameStatsRouter.get("/:id", async (req, res) => {
 gameStatsRouter.post("/", async (req, res) => {
     try{
         // const uname = req.params.uname;
+        console.log("came here 3")
+        tempmaxsc = 0
+        tempwinner = "None"
+        console.log("data",req.body.data);
+        for(let uid in req.body.data){
+            if(req.body.data[uid].score > tempmaxsc){
+                tempmaxsc = req.body.data[uid].score;
+                tempwinner = req.body.data[uid].username;
+            }
+        }
+
         const gameStats = new GameStats({
             toi: req.body.toi,
             roomno: req.body.roomno,
-            data: req.body.data
+            data: req.body.data,
+            winner: tempwinner,
+            maxsc: tempmaxsc,
+            gametype: req.body.gametype
         });
+        
         await gameStats.save();
+        console.log("game stats", gameStats);
+
+        // [data.ccuid]: {
+        //     username: data.username,
+        //     avatar: data.avatar,
+        //     score: 0,
+        //     attempted: 0,
+        //     correct: 0
+        // }
 
         for(let uid in req.body.data){
             console.log(uid);
@@ -40,11 +64,12 @@ gameStatsRouter.post("/", async (req, res) => {
             const profiled = await Profilemodel.findOne({_id:pid});
             profiled.previousGames.push(gameStats._id);
             const saveddetails = await profiled.save();
-            console.log("profiled",saveddetails);
         }
+
+
         res.json(gameStats);
     } catch(err){
-        console.error(err.message);
+        console.error(err);
         return res.status(400).json(err);
     }
 });

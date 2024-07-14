@@ -18,7 +18,7 @@ const userSchema = z.object({
 });
 
 
-userRouter.get("/", auth, async (req, res)=>{
+userRouter.get("/", /*auth*/ async (req, res)=>{
     try{
         const userd = await Profile.findById({profile: req.userd.profile});
         res.json(userd);
@@ -91,7 +91,7 @@ userRouter.post("/signup", async (req, res)=>{
 
 userRouter.post("/login", async (req, res)=>{
     const result = userSchema.safeParse(req.body);
-    console.log(req.body);
+    console.log("result", result);
     if(!result.success){
         return res.status(400).json(result.error);
     }
@@ -110,6 +110,7 @@ userRouter.post("/login", async (req, res)=>{
         const token = jwt.sign({username, email}, "SECRETKEY", {
             expiresIn: '1h',
         });
+        
 
         res.cookie('token', token, {
             httpOnly: true, 
@@ -117,10 +118,12 @@ userRouter.post("/login", async (req, res)=>{
             sameSite: 'lax', // true if your site uses
             maxAge: 3600000, // 1 hour in milliseconds
         });
-
-        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.udetails.profile._id});
+        console.log(udetails)
+        
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile});
 
     } catch(err){
+        console.log(err)
         res.status(400).json({
             msg: "some error logging in"
         });

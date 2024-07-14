@@ -11,6 +11,15 @@ const gamestats = new mongoose.Schema({
     },
     data:{
         type: Object
+    },
+    winner:{
+        type: String
+    },
+    maxsc:{
+        type: Number
+    },
+    gametype:{
+        type: String
     }
 });
 

@@ -5,8 +5,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { useSocket } from '../../SocketContext/SocketContext';
 
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
 const Profile2 = () => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState([]);
   const [profile, setProfile] = useState(null);
   const { id } = useParams();
   const [liked, setLiked] = useState(() => {
@@ -39,7 +45,7 @@ const Profile2 = () => {
   const fetchUserStats = async () => {
     const response = await axios.get(`http://localhost:3000/app/gamestats/${id}`);
     const data = await response.data;
-    console.log("data", data);
+    console.log("user stats", data);
     setUser(data);
   };
 
@@ -64,7 +70,7 @@ const Profile2 = () => {
 
   useEffect(() => {
     if (profile) {
-      setLikeCount(profile.likes.length);   
+      setLikeCount(profile.likes.length);
       setFollowCount(profile.followers.length);
     }
   }, [profile]);
@@ -133,45 +139,52 @@ const Profile2 = () => {
 
   const handleCreateRoom = async () => {
     console.log("cme1")
-    try{
-    const challengeData = {
-      roomName,
-      rulesInstructions,
-      gameType,
-      numPlayers,
-      timeLimit,
-      difficultyLevel,
-      categories,
-      createdBy: localStorage.getItem("ccusername")
-    }; 
-    const savedroom = await axios.post("http://localhost:3000/app/rooms/create", challengeData, {withCredentials: true});
-    console.log(savedroom.data.room);
-    const res = await axios.post("http://localhost:3000/app/profile/challenge", {bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date:Date.now(), profilepic: profile.profilePic,savedroom: savedroom.data.room});
-    console.log("res for challenge", res);
-    socket.emit("notification", ({bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"),topid:profile._id, date:Date.now(), profilepic: profile.profilePic}));
-    setTimer(4);
-    setInterval(() => {
-      setTimer((prevTimer) => {
-        if(prevTimer === 0){
-          navigate("/home/room/" + savedroom.data.room._id);
-        }
-        return prevTimer - 1
-      });
-    }, 1000);
-    // const res = await axios.post("http://localhost:3000/app/profile/challenge", challengeData);
-    // console.log("res for challenge", res);
-    // socket.emit("notification", ({ ...challengeData, profilepic: profile.profilePic }));
-    setOpen(false);
-  }catch(err){
-    console.error(err);
-    setOpen(false);
+    try {
+      const challengeData = {
+        roomName,
+        rulesInstructions,
+        gameType,
+        numPlayers,
+        timeLimit,
+        difficultyLevel,
+        categories,
+        createdBy: localStorage.getItem("ccusername")
+      };
+      const savedroom = await axios.post("http://localhost:3000/app/rooms/create", challengeData, { withCredentials: true });
+      console.log(savedroom.data.room);
+      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room });
+      console.log("res for challenge", res);
+      socket.emit("notification", ({ bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic }));
+      setTimer(4);
+      setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer === 0) {
+            navigate("/home/room/" + savedroom.data.room._id);
+          }
+          return prevTimer - 1
+        });
+      }, 1000);
+      // const res = await axios.post("http://localhost:3000/app/profile/challenge", challengeData);
+      // console.log("res for challenge", res);
+      // socket.emit("notification", ({ ...challengeData, profilepic: profile.profilePic }));
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      setOpen(false);
+    }
   }
-}
+
+  function convertToTime(ms){
+    console.log("ms", ms);
+    let tobj = new Date(Number(ms));
+    console.log("tobj", tobj);
+    return tobj.toLocaleString();
+  }
 
   return (
     <>
       {profile &&
-        <div className="max-w-6xl mx-auto p-8">
+        <div className="max-w-7xl mx-auto p-8">
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="flex items-center p-8 bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
               <img
@@ -184,16 +197,16 @@ const Profile2 = () => {
                 <div className="flex items-center mt-2">
                   <p className="mr-4">Rank: {user.profile || "Guardian"}</p>
                   <p className="px-2 flex gap-1 items-center">
-                    {likeCount || 0} 
+                    {likeCount || 0}
                     {!liked ? (
-                      <AiOutlineLike 
-                        className={`cursor-pointer ${animate ? 'unlike-animation' : ''}`} 
-                        onClick={sendLike} 
+                      <AiOutlineLike
+                        className={`cursor-pointer ${animate ? 'unlike-animation' : ''}`}
+                        onClick={sendLike}
                       />
                     ) : (
-                      <AiFillLike 
-                        className={`cursor-pointer ${animate ? 'like-animation' : ''}`} 
-                        onClick={sendLike} 
+                      <AiFillLike
+                        className={`cursor-pointer ${animate ? 'like-animation' : ''}`}
+                        onClick={sendLike}
                       />
                     )}
                   </p>
@@ -223,33 +236,89 @@ const Profile2 = () => {
             <h1>Total Games Lost: {user.totalGamesLost || 0}</h1>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full bg-white rounded-lg shadow-lg">
-              <thead>
-                <tr className="bg-gray-800 text-white">
-                  <th className="px-4 py-2">Game Id</th>
-                  <th className="px-4 py-2">Room name</th>
-                  <th className="px-4 py-2">Total participants</th>
-                  <th className="px-4 py-2">Winner</th>
-                  <th className="px-4 py-2">Winner Score</th>
-                  <th className="px-4 py-2">User Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {user.gameStats && user.gameStats.map((game, index) => (
-                  <tr key={index} className="border-b border-gray-200">
-                    <td className="px-4 py-2 text-center">{game.gameId}</td>
-                    <td className="px-4 py-2 text-center">{game.roomName}</td>
-                    <td className="px-4 py-2 text-center">{game.totalParticipants}</td>
-                    <td className="px-4 py-2 text-center">{game.winner}</td>
-                    <td className="px-4 py-2 text-center">{game.winnerScore}</td>
-                    <td className="px-4 py-2 text-center">{game.userScore}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+         
+          <Accordion style={{ padding: "0px", margin: "0px" }}>
+            <AccordionSummary
+
+              style={{ padding: "0px", margin: "0px" }}
+              aria-controls="panel1-content"
+              id="panel1-header"
+
+            >
+              <div className="grid grid-cols-7 w-full">
+
+                <div className="bg-gray-800 text-white text-center px-6 py-4 flex justify-center items-center">Game Type</div>
+                <div className="bg-gray-800 text-white text-center px-6 py-4 flex justify-center items-center">Room Name</div>
+                <div className="bg-gray-800 text-white text-center px-6 py-2 flex justify-center items-center">Total participants</div>
+                <div className="bg-gray-800 text-white text-center px-6 py-4 flex justify-center items-center">Winner</div>
+                <div className="bg-gray-800 text-white text-center px-6 py-4 flex justify-center items-center">Winner Score</div>
+                <div className="bg-gray-800 text-white text-center px-6 py-4 flex justify-center items-center">{(localStorage.getItem("ccusername") == id) ? "Your" : "User"} Score</div>
+                <div className="bg-gray-800 text-white text-center px-6 py-4 flex justify-center items-center">Date</div>
+              </div>
+            </AccordionSummary>
+            <AccordionDetails style={{ padding: "0px", margin: "0px" }}>
+
+              {user && user.length > 0 && user.map((game, index) => {
+
+                return (
+                  <Accordion style={{ padding: "0px", margin: "0px" }}>
+                    <AccordionSummary
+                      aria-controls="panel1-content"
+                      style={{ padding: "0px", margin: "0px" }}
+                      id="panel1-header"
+                    >
+                      <div className="grid grid-cols-7 w-full hover:bg-gray-700 hover:text-rose-50" onClick={(e)=>{
+                        if(e.target.parentElement.classList.contains("bg-gray-700")){
+                          e.target.parentElement.classList.remove("bg-gray-700")
+                          e.target.parentElement.classList.remove("text-rose-50")
+                        } else{
+                          e.target.parentElement.classList.add("bg-gray-700")
+                          e.target.parentElement.classList.add("text-rose-50")
+                        }
+                      }}>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.gametype || "MCQ Type"}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.roomno}</div>
+                        <div className="text-center px-6 py-2 flex justify-center items-center">{Object.keys(game.data).length}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.winner}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.maxsc}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[localStorage.getItem("ccuid")].score}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">
+                          {convertToTime(game.toi)}
+                        </div>
+                      </div>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ padding: "0px", margin: "0px" }} className='bg-gray-700 text-rose-50'>
+                      <div className="grid grid-cols-6" style={{marginRight: "-29px"}}>
+                        <div className="text-center px-9 py-4 flex justify-center items-center" style={{marginRight: "-10px"}}>Game Id</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">Username</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">Score</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">Attempted</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">Correct</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">Date</div>
+                      </div>
+                      {Object.keys(game.data).map((key, index) => {
+                        return (
+                          <div className="grid grid-cols-6" style={{marginRight: "-29px"}}>
+                            <div className="text-center px-16 py-4 flex justify-center items-center" style={{marginRight: "-10px"}}>{key}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].username}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].score}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].attempted}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].correct}</div>
+                            <div className="text-center px-10 py-4 flex justify-center items-center">{convertToTime(game.toi)}</div>
+                          </div>
+                        )
+                      })}
+                    </AccordionDetails>
+                  </Accordion>
+                );
+              })}
+              {!user || user.length == 0 && <div className="text-center px-6 py-4 flex justify-center items-center">No Games Found</div>}
+
+            </AccordionDetails>
+
+          </Accordion>
         </div>}
+
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create a New Challenge</DialogTitle>
