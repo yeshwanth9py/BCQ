@@ -44,12 +44,19 @@ const roomSchema = new mongoose.Schema({
   no_of_ready:{
     type: Number,
     default: 0
+  },
+  Status: {
+    type: String,
+    default: 'open to anyone'
+  },
+  private:{
+    type: Boolean,
+    default: false
+  },
+  password:{
+    type: String,
+    default: ""
   }
-  
-  // messages: [{
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Message'
-  // }]
 });
 
 const Room = mongoose.model('Room', roomSchema);

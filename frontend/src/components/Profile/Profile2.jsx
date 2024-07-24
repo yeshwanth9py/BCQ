@@ -8,8 +8,9 @@ import { useSocket } from '../../SocketContext/SocketContext';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { IconButton, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import Loader from '../Loader';
 
 const Profile2 = () => {
   const [user, setUser] = useState([]);
@@ -25,6 +26,8 @@ const Profile2 = () => {
 
   const socket = useSocket();
 
+  const [status, setStatus] = useState("loading");
+
   const [likeCount, setLikeCount] = useState(0);
   const [followCount, setFollowCount] = useState(0);
   const [animate, setAnimate] = useState(false);
@@ -38,13 +41,19 @@ const Profile2 = () => {
   const [difficultyLevel, setDifficultyLevel] = useState('');
   const [categories, setCategories] = useState('');
 
+  const [curruid, setCuid] = useState("");
+  const [display, setDisplay] = useState(false);
+
+  const [searchResults, setSearchResults] = useState("");
+
 
   const [timer, setTimer] = useState();
   const navigate = useNavigate();
 
   const fetchUserStats = async () => {
     const response = await axios.get(`http://localhost:3000/app/gamestats/${id}`);
-    const data = await response.data;
+    const data = response.data.gamed;
+    setCuid(response.data.uid);
     console.log("user stats", data);
     setUser(data);
   };
@@ -54,6 +63,7 @@ const Profile2 = () => {
     const data = await response.data;
     console.log("profile", data);
     setProfile(data[0]);
+    setStatus("success");
   };
 
   useEffect(() => {
@@ -152,7 +162,8 @@ const Profile2 = () => {
       };
       const savedroom = await axios.post("http://localhost:3000/app/rooms/create", challengeData, { withCredentials: true });
       console.log(savedroom.data.room);
-      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room });
+      console.log("room created")
+      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room }, {withCredentials: true});
       console.log("res for challenge", res);
       socket.emit("notification", ({ bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic }));
       setTimer(4);
@@ -171,14 +182,56 @@ const Profile2 = () => {
     } catch (err) {
       console.error(err);
       setOpen(false);
+      alert("An error occurred. Please try again later.");
     }
   }
 
-  function convertToTime(ms){
-    console.log("ms", ms);
+  function convertToTime(ms) {
     let tobj = new Date(Number(ms));
-    console.log("tobj", tobj);
+
     return tobj.toLocaleString();
+  }
+
+  if (status == "loading") {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
+      </div>
+    )
+  }
+
+
+  async function searchUsers(searchTerm) {
+    try{
+      console.log("inside search")
+      const response = await axios.get(`http://localhost:3000/app/profile/search/${searchTerm}`);
+      console.log("response", response);
+      return response.data
+    } catch(err){
+      console.log(err);
+      return []
+    }
+    
+  }
+
+  // const [searchTerm, setSearchTerm] = useState("");
+  async function handleSearch(e) {
+    e.preventDefault();
+    console.log(e.target.value);
+
+    if (e.target.value.trim().length > 1) {
+      setDisplay(true);
+
+      const results = await searchUsers(e.target.value);
+      setSearchResults(results);
+
+    } else {
+      setDisplay(false)
+    }
+
+
+
+    // navigate(`/profile/${searchTerm}`);
   }
 
   return (
@@ -186,6 +239,33 @@ const Profile2 = () => {
       {profile &&
         <div className="max-w-7xl mx-auto p-8">
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className='relative'>
+              <input
+                className='absolute top-16 right-44 rounded-lg outline-none px-2 py-1 border-2 border-gray-300 shadow-slate-900 shadow-md'
+                placeholder='&#128269;Search for other user...'
+                onInput={e => handleSearch(e)}
+              />
+                  
+              {display && (
+                <div className='absolute top-24 right-44 rounded-lg outline-none px-2 py-1 border-2 border-gray-300 shadow-slate-900 shadow-md bg-slate-400 w-[12.6rem]'>
+                  {searchResults?.length > 0 ? (
+                    searchResults?.map((result, index) => (
+                      <div key={index} className='py-1 px-2 border-b border-gray-300'>
+                        <div className='flex cursor-pointer gap-2' onClick={()=>{
+                          setDisplay(false);
+                          console.log(result.username);
+                          navigate(`/home/profile/`+result.username);
+                          window.location.reload();
+                        }}
+                        ><img src={result.profilePic} width={30} height={30} className='rounded-full'/> {result.username}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className='py-1 px-2'>No results found</div>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="flex items-center p-8 bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
               <img
                 src={profile.profilePic || "https://via.placeholder.com/200"}
@@ -218,6 +298,7 @@ const Profile2 = () => {
                   <Button variant="contained" color="error" onClick={() => handleChallenge(profile._id)}>Challenge</Button>
                 </div>
               </div>
+
             </div>
             <div className="p-6 bg-gray-100">
               <div className="flex justify-between mb-4">
@@ -227,7 +308,9 @@ const Profile2 = () => {
               <p className="mb-4">{profile.bio || "hi it's me"}</p>
             </div>
           </div>
-          {timer && <h1 className='text-center text-3xl text-cyan-500'>You will be redirected in {timer} sec</h1>}
+
+          {timer && <h1 className='text-center text-3xl text-cyan-500'>You will be redirected to the room in {timer} sec</h1>}
+
           <h1 className="text-center text-4xl mt-10 mb-6 font-semibold">Previous Game Stats</h1>
 
           <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex justify-around text-lg">
@@ -236,7 +319,7 @@ const Profile2 = () => {
             <h1>Total Games Lost: {user.totalGamesLost || 0}</h1>
           </div>
 
-         
+
           <Accordion style={{ padding: "0px", margin: "0px" }}>
             <AccordionSummary
 
@@ -267,11 +350,11 @@ const Profile2 = () => {
                       style={{ padding: "0px", margin: "0px" }}
                       id="panel1-header"
                     >
-                      <div className="grid grid-cols-7 w-full hover:bg-gray-700 hover:text-rose-50" onClick={(e)=>{
-                        if(e.target.parentElement.classList.contains("bg-gray-700")){
+                      <div className="grid grid-cols-7 w-full hover:bg-gray-700 hover:text-rose-50" onClick={(e) => {
+                        if (e.target.parentElement.classList.contains("bg-gray-700")) {
                           e.target.parentElement.classList.remove("bg-gray-700")
                           e.target.parentElement.classList.remove("text-rose-50")
-                        } else{
+                        } else {
                           e.target.parentElement.classList.add("bg-gray-700")
                           e.target.parentElement.classList.add("text-rose-50")
                         }
@@ -281,15 +364,16 @@ const Profile2 = () => {
                         <div className="text-center px-6 py-2 flex justify-center items-center">{Object.keys(game.data).length}</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">{game.winner}</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">{game.maxsc}</div>
-                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[localStorage.getItem("ccuid")].score}</div>
+                        {console.log("curruid", curruid)}
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{curruid ? game.data[curruid].score : 0}</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">
                           {convertToTime(game.toi)}
                         </div>
                       </div>
                     </AccordionSummary>
                     <AccordionDetails style={{ padding: "0px", margin: "0px" }} className='bg-gray-700 text-rose-50'>
-                      <div className="grid grid-cols-6" style={{marginRight: "-29px"}}>
-                        <div className="text-center px-9 py-4 flex justify-center items-center" style={{marginRight: "-10px"}}>Game Id</div>
+                      <div className="grid grid-cols-6" style={{ marginRight: "-29px" }}>
+                        <div className="text-center px-9 py-4 flex justify-center items-center" style={{ marginRight: "-10px" }}>Game Id</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">Username</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">Score</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">Attempted</div>
@@ -298,8 +382,8 @@ const Profile2 = () => {
                       </div>
                       {Object.keys(game.data).map((key, index) => {
                         return (
-                          <div className="grid grid-cols-6" style={{marginRight: "-29px"}}>
-                            <div className="text-center px-16 py-4 flex justify-center items-center" style={{marginRight: "-10px"}}>{key}</div>
+                          <div className="grid grid-cols-6" style={{ marginRight: "-29px" }}>
+                            <div className="text-center px-16 py-4 flex justify-center items-center" style={{ marginRight: "-10px" }}>{key}</div>
                             <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].username}</div>
                             <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].score}</div>
                             <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].attempted}</div>
@@ -318,8 +402,6 @@ const Profile2 = () => {
 
           </Accordion>
         </div>}
-
-
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create a New Challenge</DialogTitle>
         <DialogContent>

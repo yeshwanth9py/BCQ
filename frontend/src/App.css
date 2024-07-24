@@ -132,7 +132,18 @@ ul {
 .sidebar__listItem {
   margin: 30px 10px;
   display: flex;
-  height: 20px;
+  align-items: center;
+  height: 40px;
+}
+
+.sidebar__listItem:hover {
+  cursor: pointer;
+  color: black;
+}
+
+.sidebar__listItem:hover .sidebar__icon {
+  transform: scale(1.2);
+  color: black;
 }
 
 .sidebar__listItem span {
@@ -141,7 +152,28 @@ ul {
 
 .sidebar__icon {
   margin: 0 15px 0 0;
+  transition: transform 0.3s, color 0.3s;
 }
+
+.sidebar__logout {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  /* border-top: 1px solid #fff; */
+  margin: 30px 10px;
+}
+
+.sidebar__logout:hover .sidebar__icon {
+  transform: scale(1.2);
+  color: black;
+}
+
+.sidebar__logout span {
+  white-space: nowrap;
+  margin-left: 15px; /* Ensure consistent spacing between icon and text */
+}
+
 @keyframes gradient {
   0% {
     background-position: 0% 50%;

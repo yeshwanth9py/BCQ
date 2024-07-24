@@ -60,6 +60,30 @@ const codingqsSchema = new mongoose.Schema({
         type: String,
         enum: ['easy', 'medium', 'hard'],
         required: true
+    },
+    pystubFile:{
+        type: String,
+        required: true
+    },
+    cppstubFile:{
+        type: String,
+        required: true
+    },
+    jsstubFile:{
+        type: String,
+        required: true
+    },
+    cppfunctioncall:{
+        type: String,
+        required: true
+    },
+    jsfunctioncall:{
+        type: String,
+        required: true
+    },
+    pyfunctioncall:{
+        type: String,
+        required: true
     }
 });
 

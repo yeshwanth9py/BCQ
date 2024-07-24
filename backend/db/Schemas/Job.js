@@ -27,6 +27,10 @@ const jobSchema = new mongoose.Schema({
         type: String, 
         default: "pending",
         enum:["pending", "running", "completed", "failed"],
+    },
+    qid:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Codingqs"
     }
 });
 

@@ -40,6 +40,9 @@ profileRouter.patch("/update/:id", auth, async (req, res) => {
 });
 
 
+
+
+
 profileRouter.get("/:pnm", async (req, res) => {
     try {
         const profile = await Profile.find({ username: req.params.pnm });
@@ -48,6 +51,18 @@ profileRouter.get("/:pnm", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+profileRouter.get("/search/:pnm", async (req, res) => {
+    try{
+        const query = req.params.pnm;
+        console.log(query);
+        const users = await Profile.find({ username: { $regex: query, $options: 'i' } }).select("username bio profilePic").limit(10);
+        console.log("users",users);
+        return res.json(users);
+    } catch(err){
+        console.log(err);
+    }
+})
 
 
 profileRouter.post("/like", async (req, res) => {
@@ -115,7 +130,7 @@ profileRouter.post("/challenge", async (req, res) => {
         const challenge_time = Date.now();
         // i  want to store last 10 notifications only
         console.log("came3 after saving room");
-        profiled.notifications.unshift({msg:`${byname} has challenged you!`, byname: byname, bypid: bypid, time: challenge_time, hasSeen: false, type: "challenge", profilepic: profiled.profilePic, roomid:savedroom._id});
+        profiled.notifications.push({msg:`${byname} has challenged you!`, byname: byname, bypid: bypid, time: challenge_time, hasSeen: false, type: "challenge", profilepic: profiled.profilePic, roomid:savedroom._id});
         if(profiled.notifications.length > 10){
             profiled.notifications.shift();  //i am removig the oldest notification
         }

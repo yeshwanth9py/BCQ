@@ -10,6 +10,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import SearchAppBar from './Searchbar';
 import MultiActionAreaCard from './CardRoom';
 import Sidebar from './Sidebar';
+import { FaBolt } from 'react-icons/fa';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -91,7 +92,8 @@ const Home = () => {
         setRooms(allrooms.data.rooms);
       }
     } catch (err) {
-      alert("please login")
+      alert("please login");
+      navigate("/login");
     }
   }
 
@@ -105,6 +107,14 @@ const Home = () => {
     setUnreadchallenges(data[0].countunread);
   }
 
+  useEffect(() => {
+    axios.get("http://localhost:3000/app/user/isLoggedIn", {withCredentials: true}).then((res)=>{
+      if(res.success == false){
+        alert("please login");
+        navigate("/login");
+      }
+    })
+  }, [])
 
   // useEffect(()=>{
   //   // fetchprofile();
@@ -117,7 +127,8 @@ const Home = () => {
 
 
   useEffect(() => {
-    if(localStorage.getItem("ccusername")==null){
+    if (localStorage.getItem("ccusername") == null || localStorage.getItem("ccusername") == undefined) {
+      alert("please login");
       navigate("/login");
     }
     fetchprofile();
@@ -166,9 +177,14 @@ const Home = () => {
 
   function joinRoom(roomno) {
     console.log(roomno);
-
-    navigate(`/home/room/${roomno}`, { state: { roomno } });
-
+    try{
+      axios.post("http://localhost:3000/app/rooms/join", { roomno: roomno, uid: localStorage.getItem("ccpid") }, {withCredentials: true}).then((res) => {
+        navigate(`/home/room/${roomno}`, { state: { roomno } });
+      });
+    } catch(err){
+      console.log(err)
+      navigate("/login");
+    }
   }
 
   async function removenotification() {
@@ -182,6 +198,17 @@ const Home = () => {
 
   }
 
+  function createQuickMatch(){
+    axios.get("http://localhost:3000/app/rooms/quickmatch", {withCredentials: true}).then((res)=>{
+      console.log("kkk",res.data);
+      navigate(`/home/room/${res.data.roomid}`, { state: { roomno: res.data.roomid } });
+    })
+    .catch((err)=>{
+      console.log(err);
+      navigate("/login");
+    })
+  }
+
 
   return (
     <>
@@ -193,18 +220,27 @@ const Home = () => {
         <div className='w-full'>
           <div>
             <SearchAppBar searchOptions={searchOptions} searchfilter={setFilter} filter={filter} setSearchOptions={setSearchOptions} unreadnotifications={unreadnotifications} unreadchallenges={unreadchallenges} setUnreadchallenges={setUnreadchallenges} removenotification={removenotification} challengeNotifications={challengeNotifications} showNotifications={showNotifications} setShowNotifications={setShowNotifications} setSearchSubmit={setSearchSubmit} />
-            <Button
-              variant="contained"
-              color="success"
-              style={{ position: 'absolute', right: '10px', top: '80px' }}
-              startIcon={<AddIcon />}
-              onClick={handleOpenModal}
-            >
-              Create room
-            </Button>
+            <div className='flex justify-around pt-10'>
+              <Button variant="contained"
+                color="success"
+                onClick={createQuickMatch}
+              >
+                <FaBolt className="mr-2" />
+                Quick Match
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<AddIcon />}
+                onClick={handleOpenModal}
+              >
+                Create A room
+              </Button>
+            </div>
             <div className='m-10'>
-              <h1>Join A Room</h1>
+              <h1 className='text-2xl font-bold underline-offset-4'>Join An Existing Room:-</h1>
               <div className="max-h-[80vh] overflow-y-auto">
+                {rooms.length==0 && <p className='text-center mt-10'>No rooms available currently, no worries you can create one :)</p>}
                 {rooms.map((room, ind) => (
                   <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom} />
                 ))}

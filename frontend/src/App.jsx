@@ -10,6 +10,9 @@ import GameRoom from './components/GameRoom'
 import Profile2 from './components/Profile/Profile2.jsx'
 import Gameover from './components/Gameover/Gameover.jsx'
 import Codepage from './components/Codepage.jsx'
+import AdminControls from './components/AdminControls/AdminControls.jsx'
+import LeaderBoard from './components/Leaderboard.jsx'
+
 
 function App() {
   
@@ -26,6 +29,8 @@ function App() {
         <Route path="/game/:id" element={<Gamepage />} />
         <Route path="/gameover/:id" element={<Gameover />} />
         <Route path="/codecombat/:id" element={<Codepage />} />
+        <Route path="/admincontrols" element= {<AdminControls />} />
+        <Route path="/leaderboard" element={<LeaderBoard />} />
         <Route path="*" element={<ErrorComponent />} />
       </Routes>
     </BrowserRouter>

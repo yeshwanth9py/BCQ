@@ -73,8 +73,15 @@ function CodeBattlePage() {
   const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes
   const [score, setScore] = useState(0);
   const [skipCount, setSkipCount] = useState(3);
-  const [output, setOutput] = useState('');
+
+  const [output1, setOutput1] = useState('');
+  const [output2, setOutput2] = useState('');
+  const [output3, setOutput3] = useState('');
+  const [output4, setOutput4] = useState('');
+  const [output5, setOutput5] = useState('');
+
   const [defaultLanguage, setDefaultLanguage] = useState('py');
+  const [qd, setQd] = useState("");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -90,10 +97,79 @@ function CodeBattlePage() {
   }, []);
 
   const handleSubmit = async () => {
+    // console.log("running")
+    let jobids;
+    try {
+      setOutput1('Running...');
+      setOutput2('Running...');
+      setOutput3('Running...');
+      setOutput4('Running...');
+      setOutput5('Running...');
+
+      if(!code) {
+        alert("Please enter code");
+      }
+
+      let functioncall = "";
+
+      console.log(defaultLanguage)
+      if(defaultLanguage === "py") {
+        functioncall = qd.pyfunctioncall;
+      }else if(defaultLanguage === "cpp") {
+        functioncall = qd.cppfunctioncall;
+      }else if(defaultLanguage === "javascript") {
+        functioncall = qd.jsfunctioncall;
+      }
+      console.log("functioncll", functioncall)
+
+      const result = await axios.post("http://localhost:3000/app/codecombat/submit/"+qd.id, { lang: defaultLanguage, code, question, functioncall });
+      let job = result.data.job;
+      console.log(job)
+
+      let jobIntervalId;
+      jobIntervalId = setInterval(async () => {
+        const datares = await axios.post("http://localhost:3000/app/codecombat/status/", {job});
+        console.log(datares.data) 
+        const { success, completed } = datares.data;
+
+
+        if (success) {
+          if (completed) {
+            let output = datares.data.job.output;
+            let outputarray = output.split("\n");
+            console.log("output", outputarray)
+            setOutput1(outputarray[0]);
+            setOutput2(outputarray[1]);
+            setOutput3(outputarray[2]);
+            setOutput4(outputarray[3]);
+            setOutput5(outputarray[4]);
+            clearInterval(jobIntervalId);
+          } else{
+            console.log("its running");
+          }
+          
+        } else if (!success) {
+          setOutput1("error connecting to server");
+          setOutput2("error connecting to server");
+          setOutput3("error connecting to server");
+          setOutput4("error connecting to server");
+          console.log(datares)
+          
+          clearInterval(jobIntervalId);
+        }
+      }, 500);
+    } catch (err) {
+      console.log(err);
+      
+    }
+  };
+
+
+  const handleRun = async () => {
     let jobid;
     try {
       setOutput('Running...');
-      const result = await axios.post("http://localhost:3000/app/codecombat/submit", { lang: defaultLanguage, code, question });
+      const result = await axios.post("http://localhost:3000/app/codecombat/submit/", { lang: defaultLanguage, code, question });
       jobid = result.data.jobid;
       let jobIntervalId;
       jobIntervalId = setInterval(async () => {
@@ -109,7 +185,7 @@ function CodeBattlePage() {
       }, 500);
     } catch ({ response }) {
       if (response) {
-        setOutput(response.data.err.stderr);
+        setOutput(response);
       } else {
         setOutput("error connecting to server");
       }
@@ -128,6 +204,34 @@ function CodeBattlePage() {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
+
+  async function getQuestion() {
+    const qd = await axios.get("http://localhost:3000/app/codecombat/getrandom");
+    console.log(qd.data)
+    setQuestion(qd.data.question);
+    setQd(qd.data);
+    if (defaultLanguage == "py") {
+      setCode(qd.data.pystubFile);
+    } else if (defaultLanguage == "cpp") {
+      setCode(qd.data.cppstubFile);
+    } else if (defaultLanguage == "js") {
+      setCode(qd.data.jsstubFile);
+    }
+  }
+
+  useEffect(() => {
+    getQuestion();
+  }, [])
+
+  useEffect(() => {
+    if (defaultLanguage == "py") {
+      setCode(qd.pystubFile);
+    } else if (defaultLanguage == "cpp") {
+      setCode(qd.cppstubFile);
+    } else if (defaultLanguage == "js") {
+      setCode(qd.jsstubFile);
+    }
+  }, [defaultLanguage])
 
   return (
     <Container>
@@ -177,7 +281,11 @@ function CodeBattlePage() {
         <RightPanel>
           <Paper elevation={3} style={{ padding: '16px', backgroundColor: '#282a36', color: '#f8f8f2', height: '100%' }}>
             <Typography variant="h6">Output:</Typography>
-            <Typography>{output}</Typography>
+            <Typography>{output1}</Typography>
+            <Typography>{output2}</Typography>
+            <Typography>{output3}</Typography>
+            <Typography>{output4}</Typography>
+            <Typography>{output5}</Typography>
           </Paper>
         </RightPanel>
       </MainContent>
@@ -199,7 +307,7 @@ function CodeBattlePage() {
             </IconButton>
           </Tooltip>
         </Box>
-        
+
         <Typography variant="h6">Skips Left: {skipCount}</Typography>
       </Footer>
     </Container>

@@ -12,9 +12,13 @@ gameStatsRouter.get("/:id", async (req, res) => {
         const uname = req.params.id;
         const userDetails = await User.findOne({ username: uname });
         const pid = userDetails.profile;
-        const profiled = await Profilemodel.findOne({_id:pid}).populate("previousGames");
+        const profiled = await Profilemodel.findOne({ _id: pid })
+        .populate({
+          path: 'previousGames',
+          options: { sort: { toi: -1 } }
+        });
         console.log(profiled);
-        res.json(profiled.previousGames);
+        res.json({gamed:profiled.previousGames, uid:userDetails._id});
     } catch(err){
         console.error(err);
         return res.status(400).json(err);

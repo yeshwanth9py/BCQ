@@ -17,7 +17,7 @@ export default function MultiActionAreaCard({ room, joinRoom }) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {room.name} (Created by: {room.CreatedBy})
+            {room.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {room.description}
@@ -26,10 +26,16 @@ export default function MultiActionAreaCard({ room, joinRoom }) {
             Game Type: {room.gameType}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Number of Players: {room.numPlayers}
+            Status: {room.Status}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Max Number of Players: {room.numPlayers}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Time Limit: {room.timeLimit} seconds
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            Created by: {room.CreatedBy}
           </Typography>
         </CardContent>
       </CardActionArea>

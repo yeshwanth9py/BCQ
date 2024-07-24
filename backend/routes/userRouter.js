@@ -107,16 +107,18 @@ userRouter.post("/login", async (req, res)=>{
             return res.status(400).json({ message: 'Invalid password' });
         }
 
-        const token = jwt.sign({username, email}, "SECRETKEY", {
+        const token = jwt.sign({_id: udetails._id, username, email}, "SECRETKEY", {
             expiresIn: '1h',
         });
+
+        console.log("token", token)
         
 
         res.cookie('token', token, {
-            httpOnly: true, 
+            httpOnly: false, 
             secure: false, // true if your app is hosted on HTTPS
             sameSite: 'lax', // true if your site uses
-            maxAge: 3600000, // 1 hour in milliseconds
+            maxAge: 36000000, // 1 hour in milliseconds
         });
         console.log(udetails)
         
@@ -137,6 +139,13 @@ userRouter.get("/profile/:id", async (req, res)=>{
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+
+userRouter.get("/isLoggedIn", auth, (req, res)=>{
+    return res.json({
+        "mama": "miya",
+        success: true
+    });
 });
 
 

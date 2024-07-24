@@ -4,6 +4,7 @@ import Usercomponent from './Waitingroom.jsx/Usercomponent';
 import { io } from 'socket.io-client';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { pink } from '@mui/material/colors';
+import axios from "axios";
 
 import logo from "../assets/exit_12.png";
 
@@ -83,6 +84,8 @@ const GameRoom = () => {
           return prevSmallTimer - 1;
         });
       }, 1000);
+      // intentionally did not used await
+      axios.patch("http://localhost:3000/app/rooms/"+params.id);
       return () => clearInterval(timer);
     }
   }, [ctr]);
@@ -100,8 +103,17 @@ const GameRoom = () => {
   };
 
   const exitroom = () => {
-    socket.emit("user-disconnect", { roomno: params.id, ccuid: localStorage.getItem("ccuid") });
-    navigate("/");
+    try{
+      axios.post("http://localhost:3000/app/rooms/exitroom", { roomno: params.id, uid: localStorage.getItem("ccpid") }, {withCredentials: true}).then(()=>{
+        socket.emit("user-disconnect", { roomno: params.id, ccuid: localStorage.getItem("ccuid") });
+        navigate("/");
+      })
+    } catch(err){
+      console.log(err);
+      return res.json(err);
+    }
+   
+    
   }
 
   const sendMessage = () => {
