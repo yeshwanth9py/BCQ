@@ -56,6 +56,9 @@ const roomSchema = new mongoose.Schema({
   password:{
     type: String,
     default: ""
+  },
+  current_room_owner:{
+    type: String  //i will be storing the socket id of the user
   }
 });
 

@@ -50,6 +50,18 @@ const GameRoom = () => {
       console.log("ghjhghj", localStorage.getItem("ccusername"), localStorage.getItem("ccuid"), localStorage.getItem("ccavatar"));
     });
 
+    socket.on("request_join_room_owner", (data)=>{
+      console.log(data);
+      const resp = confirm(data.ccusername+" wants to join your room. Do you want to accept?");
+
+      if(resp){
+        socket.emit("request_join_room_owner_accept", data);
+      }else{
+        socket.emit("request_join_room_owner_reject", data);
+      }
+
+    })
+
     socket.on("someonejoined", (data) => {
       console.log(Object.keys(data));
       setUserids(Object.keys(data));

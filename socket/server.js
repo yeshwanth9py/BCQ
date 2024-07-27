@@ -28,7 +28,7 @@ const io = socketIo(server, {
     }
 });
 
-const DATA_EXPIRY_TIME = 60*1000; // 10 SECONDS
+const DATA_EXPIRY_TIME = 60 * 1000; // 10 SECONDS
 let tid;
 
 
@@ -38,44 +38,67 @@ function setExpiry(roomno, collection) {
     tid = setTimeout(async () => {
         if (collection === "allrooms" && allrooms[roomno]) {
             console.log("is getting saved...", allrooms[roomno]);
-            axios.post("http://localhost:3000/app/gamestats", { toi: toi[roomno], roomno: roomno, data: allrooms[roomno], gametype:"MCQ Type" });
+            axios.post("http://localhost:3000/app/gamestats", { toi: toi[roomno], roomno: roomno, data: allrooms[roomno], gametype: "MCQ Type" });
             delete allrooms[roomno];
             delete allwaitingrooms[roomno];
-            console.log("game stats saved successfully") 
+            console.log("game stats saved successfully")
         } else if (collection === "allwaitingrooms" && roomno in Object.keys(allwaitingrooms)) {
             delete allwaitingrooms[roomno];
         }
-        
+
     }, DATA_EXPIRY_TIME);
 }
 
 io.on("connection", (socket) => {
-    
+
     console.log("successfully started");
 
     socket.on("online", (data) => {
-        console.log("data",data)
-        const userKey =`user:${data.uid}`;
-        onlineusers[userKey] = {socketid: socket.id};
+        console.log("data", data)
+        const userKey = `user:${data.uid}`;
+        onlineusers[userKey] = { socketid: socket.id };
         console.log(onlineusers);
     });
-    
 
 
-    
+
+
     // io.emit('online', data);
-    
+
 
     // socket.broadcast.emit("someone_online", data);
-    
+
     // console.log("new client connected", socket.id);
-    socket.on("sglobal", (data)=>{
+    socket.on("sglobal", (data) => {
         socket.broadcast.emit("rglobal", data);
     });
 
     socket.on("disconnect", () => {
         console.log("client disconnected");
     });
+
+
+    socket.on("request_join_room", (data) => {
+        // socket.join(data.roomno);
+
+        // if there is atleast 1 user in witing room then send a req to the first user in the waiting room
+
+        if (allwaitingrooms[data.roomno] && Object.keys(allwaitingrooms[data.roomno]).length > 0) {
+            io.to(allwaitingrooms[data.roomno][Object.keys(allwaitingrooms[data.roomno])[0]].socketid).emit("request_join_room_owner", { ...data, requestsocketid: socket.id });
+        } else {
+            socket.emit("response_join_room", data);
+        }
+
+    });
+
+    socket.on("request_join_room_owner_accept", (data) => {
+        // socket.join(data.roomno);
+
+        io.to(data.requestsocketid).emit("response_join_room", data);
+
+
+
+    })
 
     socket.on("joinroom", (data) => {
         // console.log(allwaitingrooms[data.roomno]);
@@ -85,20 +108,21 @@ io.on("connection", (socket) => {
             [data.ccuid]: {
                 username: data.username,
                 avatar: data.avatar,
+                socketid: socket.id,
                 isReady: false,
             }
         };
-        
-
-        
 
         socket.join(data.roomno);
         // setExpiry(data.roomno, "allwaitingrooms");
 
         io.to(data.roomno).emit("someonejoined", allwaitingrooms[data.roomno]);
 
+
         // Set expiry for the waiting room data
     });
+
+
 
     socket.on("ready", (data) => {
         allwaitingrooms[data.roomno] = {
@@ -125,7 +149,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chat-message", (data) => {
-        io.to(data.roomno).emit("receive-msg", {message:data.message, username: data.username});
+        io.to(data.roomno).emit("receive-msg", { message: data.message, username: data.username });
     })
 
     socket.on("join", (data) => {
@@ -144,12 +168,12 @@ io.on("connection", (socket) => {
         console.log("allwaitingrooms some one joined", allwaitingrooms[data.roomno]);
 
         toi[data.roomno] = Date.now();
-    
+
         // console.log(data.ccuid, "has joined", data.roomno);
         // console.log("allrooms", allrooms);
 
         socket.join(data.roomno);
-        
+
         // Set expiry for the room data
         // setExpiry(data.roomno, "allrooms");
     });
@@ -171,13 +195,13 @@ io.on("connection", (socket) => {
 
     socket.on('notification', (data) => {
         console.log("notification received", data);
-        
+
         console.log(`user:${data.topid}` in onlineusers)
-        if(`user:${data.topid}` in onlineusers) {
+        if (`user:${data.topid}` in onlineusers) {
             io.to(onlineusers[`user:${data.topid}`].socketid).emit('gotnotification', data);
         }
     });
-      
+
 
     socket.on("user-disconnect", (data) => {
         // console.log(data);
@@ -186,21 +210,21 @@ io.on("connection", (socket) => {
             io.to(data.roomno).emit("someonejoined", allwaitingrooms[data.roomno]);
         }
 
-        
+
         // io.emit('offline', data);
-        
+
     });
 
     socket.on("offline", (data) => {
         // console.log(data);
         delete onlineusers[data.uid];
-        console.log("some one went ofline",onlineusers);
+        console.log("some one went ofline", onlineusers);
     });
 
-    
+
 });
 
-    
+
 
 const PORT = 5000;
 
@@ -211,7 +235,7 @@ app.get("/", (req, res) => {
 
 app.get("/app/gameover/:id", (req, res) => {
     clearTimeout(tid);
-    setExpiry(req.params.id, "allrooms");   
+    setExpiry(req.params.id, "allrooms");
     res.json(allrooms[req.params.id]);
 });
 

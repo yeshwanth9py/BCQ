@@ -117,16 +117,33 @@ codeCombatRouter.post("/submit/:qid", async (req, res) => {
         let tempcall = functioncall;
         // let jobids = [];
 
-        for (let i = 1; i <= 5; i++) {
-            const op = testcases[`testcase${i}`];
-            if (!op) continue;
+        if (lang == "py") {
+            for (let i = 1; i <= 5; i++) {
+                const op = testcases[`testcase${i}`];
+                if (!op) continue;
 
-            const { input, output } = op;
-            tempcall = tempcall.replace("###", input);
-            tempcode += `\n${tempcall}`;
+                const { input, output } = op;
+                tempcall = tempcall.replace("###", input);
+                tempcode += `\n${tempcall}`;
 
-            tempcall = functioncall;
-            // tempcode = code;
+                tempcall = functioncall;
+                // tempcode = code;
+            }
+        }
+
+        if (lang == "cpp") {
+            for (let i = 1; i <= 5; i++) {
+                const op = testcases[`testcase${i}`];
+                if (!op) continue;
+
+                const { input, output } = op;
+                tempcall = tempcall.replace("###", input);
+                tempcode += `\n${tempcall}`;
+
+                tempcall = functioncall;
+                // tempcode = code;
+            }
+            tempcode += "}"
         }
 
         const filepath = await generatefile(lang, tempcode);
@@ -151,13 +168,27 @@ codeCombatRouter.post("/submit/:qid", async (req, res) => {
 
         jobres.completedAt = new Date();
         jobres.status = "completed";
-        jobres.output = output;
+        jobres.output = [];
+        output = output.split("\r\n");
+
+
+        for (let i = 1; i <= 5; i++) {
+
+            jobres.output.push({
+                output: output[i - 1],
+                input: testcases[`testcase${i}`].input,
+                expected: testcases[`testcase${i}`].output,
+                passed: output[i - 1] == testcases[`testcase${i}`].output
+            })
+        }
+
+
         await jobres.save();
 
 
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: "Internal Server Error" });
+        res.status(500).send({ message: "Internal Server Error", error });
     }
 });
 
@@ -168,12 +199,12 @@ codeCombatRouter.post("/status", async (req, res) => {
 
         const job = await Job.findById(pjob["_id"]);
         if (!job) {
-            return res.status(404).json({ success: false, error: "Job not found" , completed: false});
+            return res.status(404).json({ success: false, error: "Job not found", completed: false });
         }
 
-        if(job.status === "completed"){
+        if (job.status === "completed") {
             return res.status(200).json({ success: true, job, completed: true });
-        }else{
+        } else {
             return res.status(200).json({ success: true, job, completed: false });
         }
     } catch (error) {

@@ -1,11 +1,20 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import { Button, CardActionArea, CardActions } from '@mui/material';
+import React, { useState } from 'react';
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+// const useStyles = makeStyles({
+//   media: {
+//     transition: 'transform 0.5s ease', // Smooth transition for the zoom effect
+//     '&:hover': {
+//       transform: 'scale(1.1)', // Zoom in effect
+//     },
+//   },
+// });
 
 export default function MultiActionAreaCard({ room, joinRoom }) {
+  // const classes = useStyles();
+  const [request, setRequest] = useState(false);
+
   return (
     <Card sx={{ maxWidth: 345 }} onClick={() => joinRoom(room._id)}>
       <CardActionArea>
@@ -14,6 +23,7 @@ export default function MultiActionAreaCard({ room, joinRoom }) {
           height="140"
           image={"https://mui.com/static/images/cards/contemplative-reptile.jpg"}
           alt="Room Image"
+          className='hover:scale-105 transition duration-300 ease-in-out'
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
@@ -26,7 +36,7 @@ export default function MultiActionAreaCard({ room, joinRoom }) {
             Game Type: {room.gameType}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Status: {room.Status}
+            Status: {room.status}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Max Number of Players: {room.numPlayers}
@@ -35,13 +45,18 @@ export default function MultiActionAreaCard({ room, joinRoom }) {
             Time Limit: {room.timeLimit} seconds
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Created by: {room.CreatedBy}
+            Created by: {room.createdBy}
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary" onClick={() => joinRoom(room._id)}>
-          Join Now
+        <Button size="small" color="primary" onClick={() => {
+          if(!request){
+            setRequest(true);
+            joinRoom(room._id) 
+          }
+        }}>
+          {request ? "Request Sent" : "Join Room"}
         </Button>
       </CardActions>
     </Card>

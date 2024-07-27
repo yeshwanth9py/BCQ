@@ -108,22 +108,14 @@ const Home = () => {
   }
 
   useEffect(() => {
-    axios.get("http://localhost:3000/app/user/isLoggedIn", {withCredentials: true}).then((res)=>{
-      if(res.success == false){
+    axios.get("http://localhost:3000/app/user/isLoggedIn", { withCredentials: true }).then((res) => {
+      if (res.success == false) {
         alert("please login");
         navigate("/login");
       }
     })
   }, [])
 
-  // useEffect(()=>{
-  //   // fetchprofile();
-  //   for(let i=0; i<challengeNotifications.length; i++){
-  //     if(!challengeNotifications[i].hasSeen){
-  //       setUnreadchallenges((unreadchallenges)=>unreadchallenges+1);
-  //     }
-  //   }
-  // }, [challengeNotifications])
 
 
   useEffect(() => {
@@ -154,7 +146,9 @@ const Home = () => {
 
       setMessages((messages) => {
         return [...messages, { text: data.text, sender: data.sender, timestamp: data.timestamp, profilepic: data.profilepic, username: data.sender }];
-      })
+      });
+
+
 
     });
 
@@ -168,6 +162,21 @@ const Home = () => {
       console.log(data);
     });
 
+    socket.on("response_join_room", (data) => {
+
+      console.log(data);
+      // console.log(roomno);
+      try {
+        axios.post("http://localhost:3000/app/rooms/join", { roomno: data.roomno, uid: localStorage.getItem("ccpid") }, { withCredentials: true }).then((res) => {
+          navigate(`/home/room/${data.roomno}`, { state: { roomno: data.roomno } });
+        });
+        
+      } catch (err) {
+        console.log(err)
+        navigate("/login");
+      }
+    })
+
     return () => {
       socket.emit("offline", ({ uid: localStorage.getItem("ccpid") }));
     }
@@ -176,15 +185,12 @@ const Home = () => {
 
 
   function joinRoom(roomno) {
-    console.log(roomno);
-    try{
-      axios.post("http://localhost:3000/app/rooms/join", { roomno: roomno, uid: localStorage.getItem("ccpid") }, {withCredentials: true}).then((res) => {
-        navigate(`/home/room/${roomno}`, { state: { roomno } });
-      });
-    } catch(err){
-      console.log(err)
-      navigate("/login");
-    }
+    // first get the socket id of the room owner and send the join request
+    //if successfull send the room no as well to join
+
+
+    socket.emit("request_join_room", { roomno: roomno, ccuid: localStorage.getItem("ccuid"), ccusername: localStorage.getItem("ccusername") });
+    
   }
 
   async function removenotification() {
@@ -198,15 +204,15 @@ const Home = () => {
 
   }
 
-  function createQuickMatch(){
-    axios.get("http://localhost:3000/app/rooms/quickmatch", {withCredentials: true}).then((res)=>{
-      console.log("kkk",res.data);
+  function createQuickMatch() {
+    axios.get("http://localhost:3000/app/rooms/quickmatch", { withCredentials: true }).then((res) => {
+      console.log("kkk", res.data);
       navigate(`/home/room/${res.data.roomid}`, { state: { roomno: res.data.roomid } });
     })
-    .catch((err)=>{
-      console.log(err);
-      navigate("/login");
-    })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      })
   }
 
 
@@ -240,7 +246,7 @@ const Home = () => {
             <div className='m-10'>
               <h1 className='text-2xl font-bold underline-offset-4'>Join An Existing Room:-</h1>
               <div className="max-h-[80vh] overflow-y-auto">
-                {rooms.length==0 && <p className='text-center mt-10'>No rooms available currently, no worries you can create one :)</p>}
+                {rooms.length == 0 && <p className='text-center mt-10'>No rooms available currently, no worries you can create one :)</p>}
                 {rooms.map((room, ind) => (
                   <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom} />
                 ))}

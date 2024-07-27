@@ -21,7 +21,7 @@ const jobSchema = new mongoose.Schema({
         type: Date
     },
     output:{
-        type: String
+        type: []
     },
     status:{
         type: String, 

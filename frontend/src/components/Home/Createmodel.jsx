@@ -40,11 +40,13 @@ const BasicModal = ({ open, handleClose }) => {
         handleClose();
       }).catch((err) => {
         console.log(err);
-        alert("please login")
+        alert("please login");
+        navigate("/login")
       });
     } catch (err) {
-      alert("please login")
+      alert("please login");
       console.log(err);
+      navigate("/login");
     }
   };
 

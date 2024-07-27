@@ -1,12 +1,12 @@
 {
   "dependencies": {
+    "@mui/styles": "^5.16.5",
     "concurrently": "^8.2.2"
   },
   "name": "bcq",
   "description": "Battle Choice Question",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "dev": "concurrently \"npm run dev-frontend\" \"npm run dev-backend\" \"npm run dev-socket\"",
     "dev-frontend": "cd frontend && npm run dev",

@@ -10,7 +10,7 @@ if(!fs.existsSync(outputpath)){
 }
 
 const executepy = async (filepath)=>{
-
+    try{
     const p =  new Promise((res, rej)=>{  
         exec(`python ${filepath}`, (error, stdout, stderr)=>{
             if(error){
@@ -26,9 +26,14 @@ const executepy = async (filepath)=>{
 
     });
     p.catch((err)=>{
-        console.log(err);
+        console.log("err",err);
     })
     return p;
+}
+catch(err){
+    console.log(err);
+    return err;
+}
     
 
 
