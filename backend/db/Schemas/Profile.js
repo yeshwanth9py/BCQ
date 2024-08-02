@@ -46,7 +46,8 @@ const profileschema = new mongoose.Schema({
         // expires: '9d'
     },
     countunread: {
-        type: Number
+        type: Number,
+        default: 0
     },
     createdAt: {
         type: Date,

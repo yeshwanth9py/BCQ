@@ -25,6 +25,7 @@ const menuItems = [
 const Sidebar = ({setChats}) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  {console.log("name", localStorage.getItem("ccusername"))}
 
   useEffect(() => {
     setTimeout(() => {
