@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
