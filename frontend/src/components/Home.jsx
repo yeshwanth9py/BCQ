@@ -46,8 +46,10 @@ const Home = () => {
 
   const [searchsubmit, setSearchSubmit] = useState(false);
   const [rooms, setRooms] = useState([]);
+  const [filterrooms, setfilterrooms] = useState([]);
   const [messages, setMessages] = useState([]);
   const [passwordentered, setpasswordentered] = useState("");
+  const [chats, setChats] = useState(false)
 
 
   const handleOpenModal = () => setShowModal(true);
@@ -80,19 +82,13 @@ const Home = () => {
 
 
 
-  async function getrooms(filter = "") {
+  async function getrooms() {
     try {
       console.log(filter.trim())
-      if (filter.trim() != "") {
-        const filteredrooms = await axios.get(`http://localhost:3000/app/rooms/filter/${filter}`);
-        console.log("filtered rooms", filteredrooms.data);
-        setRooms(filteredrooms.data.rooms);
-      } else {
-        console.log("all rooms fetching...");
-        const allrooms = await axios.get("http://localhost:3000/app/rooms/all");
-        console.log(allrooms.data.rooms);
-        setRooms(allrooms.data.rooms);
-      }
+      console.log("all rooms fetching...");
+      const allrooms = await axios.get("http://localhost:3000/app/rooms/all");
+      console.log(allrooms.data.rooms);
+      setRooms(allrooms.data.rooms);
     } catch (err) {
       alert("please login");
       navigate("/login");
@@ -127,12 +123,33 @@ const Home = () => {
       alert("please login");
       navigate("/login");
     }
+    getrooms()
     fetchprofile();
+    
   }, [])
 
   useEffect(() => {
-    getrooms(filter);
-  }, [searchsubmit]);
+    console.log("searchoptions",searchOptions, "filter", filter);
+    const tempfilter = rooms.filter((room) => {
+      if (filter.trim() == "") {
+        return room
+      }
+      else if (searchOptions.CreatedBy && room.CreatedBy.toLowerCase().includes(filter.toLowerCase())) {
+        return room
+      }
+      else if (searchOptions.name && room.name.toLowerCase().includes(filter.toLowerCase())) {
+        return room
+      }
+      else if (searchOptions.description && room.description.toLowerCase().includes(filter.toLowerCase())) {
+        return room
+      }
+      else {
+        return null
+      }
+    })
+
+    setfilterrooms(tempfilter);
+  }, [searchsubmit, filter, rooms]);
 
 
   useEffect(() => {
@@ -227,7 +244,7 @@ const Home = () => {
       <BasicModal open={showModal} handleClose={handleCloseModal} />
       <div className='flex'>
         <div>
-          <Sidebar />
+          <Sidebar setChats={setChats} />
         </div>
         <div className='w-full'>
           <div>
@@ -236,6 +253,7 @@ const Home = () => {
               <Button variant="contained"
                 color="success"
                 onClick={createQuickMatch}
+                className='hover:scale-110'
               >
                 <FaBolt className="mr-2" />
                 Quick Match
@@ -245,6 +263,7 @@ const Home = () => {
                 color="success"
                 startIcon={<AddIcon />}
                 onClick={handleOpenModal}
+                className='hover:scale-110'
               >
                 Create A room
               </Button>
@@ -253,15 +272,16 @@ const Home = () => {
               <h1 className='text-2xl font-bold underline-offset-4 mb-2'>Join An Existing Room:-</h1>
               <div className="max-h-[80vh] overflow-y-auto grid grid-cols-2 gap-4">
                 {rooms.length == 0 && <p className='text-center mt-10'>No rooms available currently, no worries you can create one :)</p>}
-                {rooms.map((room, ind) => (
+                {filterrooms && filterrooms.map((room, ind) => (
                   <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom} setpasswordentered={setpasswordentered} />
                 ))}
+                
               </div>
             </div>
           </div>
         </div>
 
-        <SidebarChat messages={messages} setMessages={setMessages} handleSendMessage={handleSendMessage} setUnreadnotifications={setUnreadnotifications} />
+        <SidebarChat messages={messages} setMessages={setMessages} handleSendMessage={handleSendMessage} setUnreadnotifications={setUnreadnotifications} setChats={setChats} chats={chats}/>
 
       </div>
     </>

@@ -51,6 +51,22 @@ const profileschema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    totalpoints:{
+        type: Number,
+        default: 0
+    },
+    winlossratio:{
+        type: String,
+        default: "0"
+    },
+    totalGamesPlayed:{
+        type: Number,
+        default: 0
+    },
+    totalGamesWon:{
+        type: Number,
+        default: 0
     }
 });
 

@@ -159,6 +159,7 @@ const GameRoom = () => {
         {gamedetails[alluserids.length - 1]}
       </div>
       <div className='text-slate-200 text-right px-6 text-xl my-7 absolute top-24 right-0'>
+        {console.log(allusers)}
         Min no of players - 2
         <br />
         Max no of players - 8

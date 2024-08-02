@@ -32,7 +32,7 @@ const BasicModal = ({ open, handleClose }) => {
 
   const handleSubmit = async () => {
     try {
-      console.log(formdetails);
+      console.log("form before submitting",formdetails);
       axios.post("http://localhost:3000/app/rooms/create", formdetails, {
         withCredentials: true
       }).then((resp) => {
@@ -152,6 +152,7 @@ const BasicModal = ({ open, handleClose }) => {
             value={formdetails.categories}
             onChange={handleChange}
           >
+            <MenuItem value="">ALL</MenuItem>
             <MenuItem value="Data Structures">Data Structures</MenuItem>
             <MenuItem value="Algorithms">Algorithms</MenuItem>
             <MenuItem value="Web Development">Web Development</MenuItem>

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import back from '../../assets/exit_12.png';
 import { Button } from '@mui/material';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const Gameover = () => {
     const params = useParams();
@@ -24,7 +25,7 @@ const Gameover = () => {
 
     return (
         <div className='bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 min-h-screen flex flex-col items-center'>
-            <div className="text-5xl font-extrabold text-white mt-16">
+            <div className="text-5xl font-extrabold text-white mt-16 cursor-pointer hover:scale-110">
                 Game Over
             </div>
             <div className="w-full max-w-6xl mt-10 bg-white rounded-lg shadow-2xl text-gray-800 overflow-x-auto">
@@ -69,8 +70,8 @@ const Gameover = () => {
                     Back to Home
                 </div>
             </div>
-
-            <div className='w-full max-w-6xl bg-gray-800 text-white mt-8 rounded-lg shadow-lg'>
+            <FaArrowLeft className='fixed top-[50%] left-1 text-xl cursor-pointer bg-white rounded-full w-28 h-16 hover:scale-105' onClick={()=>{navigate("/")}}/>
+            <div className='w-full max-w-6xl bg-gray-800 text-white mt-8 rounded-lg shadow-lg cursor-pointer'>
                 <div className='p-4'>
                     {state.prevdata && Object.keys(state.prevdata).map((key, ind) => (
                         <div key={key} className='my-4 p-4 bg-gray-700 rounded-lg'>

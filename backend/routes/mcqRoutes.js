@@ -24,12 +24,28 @@ mcqRouter.get("/getrandom", async (req, res)=>{
 
     const randommcq = await MCQ.aggregate([{$sample:{size:1}}]);
     if(randommcq.length>0){
-        const {_id, question, options} = randommcq[0]
-        res.json({id:_id, question, options});
+        const {_id, question, options, category} = randommcq[0]
+        res.json({id:_id, question, options, category});
     } else{
         res.status(404).json({message: "no docs found"});
     } 
 })
+
+mcqRouter.get("/category", async (req, res)=>{
+    const { category } = req.query;
+    try{
+        const mcq = await MCQ.find({category: category});
+        return res.json({
+            id: mcq._id,
+            question: mcq.question,
+            options: mcq.options,
+            category: mcq.category
+        });
+    } catch(err){
+        console.error(err);
+        return res.status(400).json(err);
+    }
+});
 
 mcqRouter.post("/checkans", async (req, res)=>{
     console.log(req.body)

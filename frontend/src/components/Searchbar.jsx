@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -63,7 +64,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar({ searchfilter, filter,searchOptions, setSearchOptions, unreadnotifications, unreadchallenges, removenotification, challengeNotifications, showNotifications, setShowNotifications, setSearchSubmit }) {
+export default function PrimarySearchAppBar({ searchfilter, filter, searchOptions, setSearchOptions, unreadnotifications, unreadchallenges, removenotification, challengeNotifications, showNotifications, setShowNotifications, setSearchSubmit }) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -191,6 +192,15 @@ export default function PrimarySearchAppBar({ searchfilter, filter,searchOptions
     </Menu>
   );
 
+  const [isClicked, setIsClicked] = useState(false);
+
+  React.useEffect(() => {
+    setTimeout(()=>{
+      setIsClicked(true)
+    }, 2000)
+  }, []);
+
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -204,14 +214,28 @@ export default function PrimarySearchAppBar({ searchfilter, filter,searchOptions
           >
             {/* <MenuIcon /> */}
           </IconButton>
-          <Typography
+          {/* <Typography
             variant="h6"
             noWrap
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
             CodeCombat
-          </Typography>
+          </Typography> */}
+          {/* <div className='text-3xl font-semibold cursor-pointer'>
+            <span className='text-red-500'>C</span>ode <span className='text-red-500'>C</span>ombat
+          </div> */}
+
+          <div
+            className="text-3xl font-semibold cursor-pointer relative"
+            onClick={() => setIsClicked(true)}
+            onAnimationEnd={() => setIsClicked(false)}
+          >
+            <span className={`text-red-500 inline-block transition-transform ${isClicked ? 'animate-touch-c-left' : ''}`}>C</span>
+            <span className={`transition-opacity ${isClicked ? 'animate-fade' : 'opacity-100'}`}>ode</span>
+            <span className={`text-red-500 inline-block transition-transform ${isClicked ? 'animate-touch-c-right' : ''}`}>C</span>
+            <span className={`transition-opacity ${isClicked ? 'animate-fade' : 'opacity-100'}`}>ombat</span>
+          </div>
 
           <Search>
             <SearchIconWrapper>
@@ -237,30 +261,30 @@ export default function PrimarySearchAppBar({ searchfilter, filter,searchOptions
                 setSearchOptions((searchOptions) => {
                   return { ...searchOptions, name: e.target.checked }
                 })
-              }}/>
+              }} />
               <label htmlFor="name" className='cursor-pointer'>Room name</label>
             </div>
             <div className="mb-2">
-              <input type="checkbox" id="description" className="mr-2 cursor-pointer" checked={searchOptions.description} onChange={(e)=>{
+              <input type="checkbox" id="description" className="mr-2 cursor-pointer" checked={searchOptions.description} onChange={(e) => {
                 setSearchOptions((searchOptions) => {
                   return { ...searchOptions, description: e.target.checked }
                 })
-              }}/>
+              }} />
               <label htmlFor="description" className='cursor-pointer'>Description</label>
             </div>
             <div className="mb-2">
-              <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" checked={searchOptions.CreatedBy} onChange={(e)=>{
+              <input type="checkbox" id="CreatedBy" className="mr-2 cursor-pointer" checked={searchOptions.CreatedBy} onChange={(e) => {
                 setSearchOptions((searchOptions) => {
                   return { ...searchOptions, CreatedBy: e.target.checked }
                 })
-              }}/>
+              }} />
               <label htmlFor="CreatedBy" className='cursor-pointer'>Created By</label>
             </div>
             <div className='text-center'><button className="bg-gray-800 text-white rounded-lg px-3 py-2 text-sm"
-             onClick={() => {
-              setSearchSubmit((p)=>!p);
-              setSettingsopen(!settingsopen);
-             }}>Apply</button></div>
+              onClick={() => {
+                setSearchSubmit((p) => !p);
+                setSettingsopen(!settingsopen);
+              }}>Apply</button></div>
           </div>}
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -300,7 +324,7 @@ export default function PrimarySearchAppBar({ searchfilter, filter,searchOptions
                         <p className="text-xs text-gray-400">{new Date(notification.time).toLocaleString()}</p>
                       </div>
                       {console.log(notification)}
-                      <button className="text-sm bg-green-600 rounded-lg px-3 py-1 hover:bg-green-700" onClick={()=>navigate("/home/room/" + notification.roomid)}>Accept</button>
+                      <button className="text-sm bg-green-600 rounded-lg px-3 py-1 hover:bg-green-700" onClick={() => navigate("/home/room/" + notification.roomid)}>Accept</button>
                     </div>
                   ))}
                 </div>

@@ -17,13 +17,12 @@ import axios from "axios";
 
 const menuItems = [
   { title: "Home", icon: faCompass, link: "/home" },
+  { title: "Code Combat(GYM)", icon: faServer, link: "/codecombat/0" },
   { title: "Profile", icon: faUsers, link: "home/profile/"+localStorage.getItem("ccusername") },
-  { title: "Chats", icon: faCloud, link: "/chats" },
   { title: "Leaderboard", icon: faCogs, link: "/leaderboard" },
-  { title: "Battles", icon: faServer, link: "/battles" },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({setChats}) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -64,9 +63,11 @@ const Sidebar = () => {
                 >
                   <span className="text-center hover:text-xl" onClick={() => navigate(item.link)}>{item.title}</span>
                 </CSSTransition>
+
               </div>
             </li>
           ))}
+          <span className="text-white hover:text-xl text-center mx-auto ml-3 cursor-pointer" onClick={()=>setChats((prev)=>!prev)}><FontAwesomeIcon className={"sidebar__icon"} icon={faCloud} /><span className={`${!isOpen?"hidden":""}`}>chats</span></span>
         </ul>
       </div>
       

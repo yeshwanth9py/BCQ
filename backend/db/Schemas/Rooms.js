@@ -18,7 +18,8 @@ const roomSchema = new mongoose.Schema({
     type: String
   },
   categories: {
-    type: String
+    type: String,
+    default: ""
   },
   image: {
       type: String

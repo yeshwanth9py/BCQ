@@ -20,7 +20,7 @@ export default function MyClock() {
 
 
   const [prevdata, setprevdata] = useState([]);
-
+  const [category, setCategory] =useState("");
 
   const choiceRefs = useRef([]);
 
@@ -115,6 +115,11 @@ export default function MyClock() {
         const secs = timer % 60;
         setMinutes(mins);
         setSeconds(secs);
+        console.log("got a room",res.data.room.categories);
+        if(res.data.room.categories){
+          setCategory(res.data.room.categories=="All"?"":res.data.room.categories);
+        }
+
 
       } catch (err) {
         console.log(err);
@@ -143,11 +148,21 @@ export default function MyClock() {
 
   async function getmcqs() {
 
-    const allmcqs = await axios.get("http://localhost:3000/app/mcqs/getrandom");
-    setDisableOptions(false)
-    setQuestions(allmcqs.data);
-    setExplanation("");
-    resetChoiceColors();
+    if(!category){
+
+      const allmcqs = await axios.get("http://localhost:3000/app/mcqs/getrandom");
+      setDisableOptions(false)
+      setQuestions(allmcqs.data);
+      setExplanation("");
+      resetChoiceColors();
+    }else{
+      console.log("fetching the cat one only");
+      const allmcqs = await axios.get("http://localhost:3000/app/mcqs/category?category="+category);
+      setDisableOptions(false)
+      setQuestions(allmcqs.data);
+      setExplanation("");
+      resetChoiceColors();
+    }
   }
 
   function resetChoiceColors() {

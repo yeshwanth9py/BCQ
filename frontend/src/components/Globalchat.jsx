@@ -14,12 +14,15 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
   },
 }));
 
-const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifications }) => {
+const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifications,setChats, chats }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const toggleDrawer = () => {
+    if(isOpen) {
+      setChats(false);
+    }
     setIsOpen(!isOpen);
   };
 
@@ -34,7 +37,8 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
       <IconButton onClick={toggleDrawer} className="fixed bottom-5 right-5 bg-blue-500 hover:bg-blue-700 text-white">
         {isOpen ? <CloseIcon /> : <IoLogoSnapchat className='absolute top-10 right-28 p-1 scale-150' color="white" />}
       </IconButton>
-      <StyledDrawer anchor="right" open={isOpen} onClose={toggleDrawer}>
+
+      <StyledDrawer anchor="right" open={isOpen || chats} onClose={toggleDrawer}>
         <div className="flex flex-col h-full">
           <div className="flex flex-col items-center p-4 bg-gray-800">
             <h2 className="text-white font-bold text-lg">Welcome to Global Chat</h2>
@@ -42,12 +46,11 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
           <div className="flex-grow overflow-y-auto p-4">
             <List>
               {messages.map((msg, index) => (
-                <ListItem key={index} className="text-white">
-                  <ListItemAvatar>
+                <ListItem key={index} className="text-white cursor-pointer" onClick={() => navigate(`/home/profile/${msg.sender === "You" ? localStorage.getItem("ccusername") : msg.sender}`)}>
+                  <ListItemAvatar className="cursor-pointer">
                     <Avatar 
                       src={msg.profilepic} 
                       className='cursor-pointer' 
-                      onClick={() => navigate(`/home/profile/${msg.sender === "You" ? localStorage.getItem("ccusername") : msg.sender}`)}
                     >
                       {msg.sender.charAt(0)}
                     </Avatar>

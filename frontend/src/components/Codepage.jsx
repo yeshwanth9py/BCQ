@@ -435,7 +435,10 @@ function CodeBattlePage() {
         <Timer variant="h6">
           Time Left: {formatTime(timeLeft)}
         </Timer>
-        <h1 className='font-bold text-xl ml-3'>Total Score:-{score}</h1>
+        <div>
+          <h1 className='font-bold text-xl ml-3'>Total Score:-{score}</h1>
+          <h1 className='font-bold text-xl ml-3 mt-2'>Skips Left:-{score}</h1>
+        </div>
       </Header>
       <MainContent>
         <LeftPanel>

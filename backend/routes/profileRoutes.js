@@ -40,6 +40,15 @@ profileRouter.patch("/update/:id", auth, async (req, res) => {
 });
 
 
+profileRouter.get("/", async (req, res) => {
+    try {
+        const profiles = await Profile.find({});
+        res.status(200).json(profiles);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 
@@ -135,6 +144,7 @@ profileRouter.post("/challenge", async (req, res) => {
         if(profiled.notifications.length > 10){
             profiled.notifications.shift();  //i am removig the oldest notification
         }
+        profiled.notifications.sort((a, b) => b.time - a.time);
 
         profiled.countunread += 1;
         await profiled.save();

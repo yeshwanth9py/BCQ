@@ -63,6 +63,7 @@ function deleteRoom(roomid){
           className='overflow-hidden h-60 hover:scale-110 transition duration-1000 ease-in-out rounded-lg' 
         />
         <CardContent>
+          {console.log("room:-", room)}
           <Typography gutterBottom variant="h5" component="div">
             {room.name}
           </Typography>
@@ -74,6 +75,9 @@ function deleteRoom(roomid){
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Status: {room.Status}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Category: {room.categories || "ALL"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Max Number of Players: {room.numPlayers}

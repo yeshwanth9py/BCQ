@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
+import { FaArrowLeft } from 'react-icons/fa';
 import { useSocket } from '../../SocketContext/SocketContext';
 
 import Accordion from '@mui/material/Accordion';
@@ -280,6 +281,7 @@ const Profile2 = () => {
                 </div>
               )}
             </div>
+            
             <div className="flex items-center p-8 bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
               <img
                 src={profile.profilePic || "https://via.placeholder.com/200"}
@@ -312,9 +314,9 @@ const Profile2 = () => {
                   <Button variant="contained" color="error" onClick={() => handleChallenge(profile._id)}>Challenge</Button>
                 </div>
               </div>
-
+              <FaArrowLeft className='fixed top-[50%] left-1 text-xl cursor-pointer bg-black rounded-full w-28 h-16 hover:scale-105' onClick={()=>{navigate(-1)}}/>
             </div>
-            <div className="p-6 bg-gray-100">
+            <div className="p-6 bg-gray-100"> 
               <div className="flex justify-between mb-4">
                 <p>{followCount || 0} followers</p>
                 <p>{profile.following.length || 0} following</p>
@@ -330,7 +332,7 @@ const Profile2 = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex justify-around text-lg">
             <h1>Win/Loss ratio: {user.winLossRatio || 0}</h1>
             <h1>Total Games Played: {user.totalGamesPlayed || 0}</h1>
-            <h1>Total Games Lost: {user.totalGamesLost || 0}</h1>
+            <h1>Total Games Won: {user.totalGamesLost || 0}</h1>
           </div>
 
 
@@ -439,6 +441,7 @@ const Profile2 = () => {
           Next
         </button>
       </div>
+     
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create a New Challenge</DialogTitle>
         <DialogContent>
