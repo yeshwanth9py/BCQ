@@ -25,35 +25,19 @@ connectdb();
 //     }
 // ))
 
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://bcq-1wuwjsyam-hello-048eb550.vercel.app"
-];;
 
-// CORS options with a function to dynamically set the origin
 const corsOptions = {
     origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin) || !origin) {
-            // Allow requests with no origin (e.g., mobile apps or curl requests)
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+        // Allow any origin
+        callback(null, true);
     },
-    credentials: true
+    credentials: true // Enable credentials for cookies
 };
 
-// Use CORS middleware
 app.use(cors(corsOptions));
 
-
 app.use(express.json());
-app.use(cookieParser(
-    {
-        httpOnly: true,
-        secure: true
-    }
-));
+app.use(cookieParser());
 
 
 

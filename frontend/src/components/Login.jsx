@@ -31,7 +31,9 @@ const Login = () => {
             localStorage.setItem("ccuid", res.data.uid);
             localStorage.setItem("ccusername", res.data.username);
             localStorage.setItem("ccavatar", res.data.profilePic);
-            localStorage.setItem("ccpid", res.data.pid)
+            localStorage.setItem("ccpid", res.data.pid);
+
+            sessionStorage.setItem("token", res.data.token);
             
             setisloading(true);
         }).then((res) => {

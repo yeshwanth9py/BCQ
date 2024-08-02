@@ -106,8 +106,12 @@ const Home = () => {
   }
 
   useEffect(() => {
-    axios.get("http://localhost:3000/app/user/isLoggedIn", { withCredentials: true }).then((res) => {
-      console.log("profile:-", res.data);
+    axios.get("http://localhost:3000/app/user/isLoggedIn", {
+      withCredentials: true,
+      headers: {
+        'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+        'Content-Type': 'application/json' // Include other headers as needed
+      }
     }).catch((err)=>{
       console.log(err)
       if(!err?.response?.success){

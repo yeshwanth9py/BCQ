@@ -128,7 +128,7 @@ userRouter.post("/login", async (req, res)=>{
         });
         console.log(udetails)
         
-        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile});
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile, token});
 
     } catch(err){
         console.log(err)
