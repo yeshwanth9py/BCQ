@@ -108,7 +108,7 @@ userRouter.post("/login", async (req, res)=>{
         }
 
         const token = jwt.sign({_id: udetails._id, username, email}, "SECRETKEY", {
-            expiresIn: '1h',
+            expiresIn: '6h',
         });
 
         console.log("token", token)
@@ -142,6 +142,7 @@ userRouter.get("/profile/:id", async (req, res)=>{
 });
 
 userRouter.get("/isLoggedIn", auth, (req, res)=>{
+    console.log("authorized req")
     return res.json({
         "mama": "miya",
         success: true

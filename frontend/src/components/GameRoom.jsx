@@ -63,18 +63,22 @@ const GameRoom = () => {
     })
 
     socket.on("someonejoined", (data) => {
+      
       console.log(Object.keys(data));
       setUserids(Object.keys(data));
       setAllusers(data);
     });
 
     socket.on("readyb", (data) => {
+      console.log(data);
       setAllusers(data);
+      console.log("total ready:-", ctr);
       setCtr((prevCtr) => prevCtr + 1);
     });
 
     socket.on("cancelb", (data) => {
       setAllusers(data);
+      console.log("total ready:-", ctr);
       setCtr((prevCtr) => prevCtr - 1);
     });
 
@@ -87,6 +91,10 @@ const GameRoom = () => {
   useEffect(() => {
     if (ctr === alluserids.length && ctr >= 2) {
       setDisablebtn(true);
+      // intentionally did not used await will update the game status to in game
+      console.log("http://localhost:3000/app/rooms/"+params.id);
+      axios.patch("http://localhost:3000/app/rooms/"+params.id);
+
       const timer = setInterval(() => {
         setSmallTimer((prevSmallTimer) => {
           if (prevSmallTimer <= 0) {
@@ -96,15 +104,18 @@ const GameRoom = () => {
           return prevSmallTimer - 1;
         });
       }, 1000);
-      // intentionally did not used await
-      axios.patch("http://localhost:3000/app/rooms/"+params.id);
+      
       return () => clearInterval(timer);
     }
+
+    // return ()=>{
+    //   exitroom();
+    // }
   }, [ctr]);
 
   const gamedetails = ["Solo", "Duo", "Trio", "Quartet", "Quintet", "Sextet", "Septet", "Octet"];
 
-  const startgame = () => {
+  const startgame = (e) => {
     if (!isReady) {
       setIsReady(true);
       socket.emit("ready", { roomno: params.id, ccuid: localStorage.getItem("ccuid") });
@@ -144,7 +155,7 @@ const GameRoom = () => {
           or just Wait For Other Players To Join...
         </p>
       </nav>
-      <div className="absolute top-16 left-0 right-0 z-10 bg-red-700 w-1/5 mx-auto flex justify-center items-center text-3xl p-2 rounded-lg shadow-lg" style={{ height: "10vh" }}>
+      <div className="absolute top-16 left-0 right-0 z-10 bg-red-700 w-1/5 mx-auto flex justify-center items-center text-3xl p-2 rounded-lg shadow-lg cursor-pointer" style={{ height: "10vh" }}>
         {gamedetails[alluserids.length - 1]}
       </div>
       <div className='text-slate-200 text-right px-6 text-xl my-7 absolute top-24 right-0'>
@@ -163,7 +174,7 @@ const GameRoom = () => {
         </div>
       ) : (
         <button
-          className='text-center bg-gradient-to-r from-sky-500 to-cyan-700 hover:from-cyan-700 hover:to-sky-500 w-fit p-5 text-4xl rounded-lg block mx-auto relative top-20 shadow-lg transition duration-300 transform hover:scale-105 active:scale-95'
+          className={`text-center ${isReady ? "bg-red-600" : "bg-slate-200 hover:bg-red-600"}  w-fit p-5 text-4xl rounded-lg block mx-auto relative top-30 shadow-lg transition duration-300 transform hover:scale-105 active:scale-951`}
           onClick={startgame}
         >
           {isReady ? "Cancel" : "Ready"}

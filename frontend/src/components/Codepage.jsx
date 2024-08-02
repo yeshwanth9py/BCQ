@@ -131,7 +131,7 @@ function CodeBattlePage() {
   const handleSubmit = async () => {
     // console.log("running")
     let jobids;
-    setOutput("Testcase-1")
+    
     try {
       setoutexp({
         testcase1: {
@@ -222,7 +222,7 @@ function CodeBattlePage() {
               }
             })
 
-
+            setOutput("Testcase-1")
             clearInterval(jobIntervalId);
             let totpassed = 0;
             for (let i = 0; i < outputarray.length; i++) {
@@ -318,8 +318,9 @@ function CodeBattlePage() {
         const { data: dataRes } = await axios.get("http://localhost:3000/app/codecombat/status/?id=" + jobid);
         const { success, job } = dataRes;
         if (success && job.status === "completed") {
-          setOutput(job.output);
+          
           setQd(job);
+          setOutput(job.output);
           clearInterval(jobIntervalId);
         } else if (!success) {
           setOutput("error connecting to server");
@@ -375,9 +376,60 @@ function CodeBattlePage() {
       setCode(qd.jsstubFile);
     }
   }, [defaultLanguage])
-  
+
+
+  const [displayOutput, setDisplayOutput] = useState("");
+  const [displayInput, setDisplayInput] = useState("");
+  const [displayExpected, setDisplayExpected] = useState("");
+
+  useEffect(() => {
+    if (output === "Testcase-1") {
+      setDisplayOutput(outexp.testcase1.output);
+    } else if (output === "Testcase-2") {
+      setDisplayOutput(outexp.testcase2.output);
+    } else if (output === "Testcase-3") {
+      setDisplayOutput(outexp.testcase3.output);
+    } else if (output === "Testcase-4") {
+      setDisplayOutput(outexp.testcase4.output);
+    } else if (output === "Testcase-5") {
+      setDisplayOutput(outexp.testcase5.output);
+    }
+    console.log("output", output, "dispaly", displayOutput)
+
+    if(output==="Testcase-1"){
+      setDisplayInput(outexp.testcase1.input);
+    }else if(output==="Testcase-2"){
+      setDisplayInput(outexp.testcase2.input);
+    }else if(output==="Testcase-3"){
+      setDisplayInput(outexp.testcase3.input);
+    }else if(output==="Testcase-4"){
+      setDisplayInput(outexp.testcase4.input);
+    }else if(output==="Testcase-5"){
+      setDisplayInput(outexp.testcase5.input);
+    }
+
+    if(output==="Testcase-1"){
+      setDisplayExpected(outexp.testcase1.expected);
+    }else if(output==="Testcase-2"){
+      setDisplayExpected(outexp.testcase2.expected);
+    }else if(output==="Testcase-3"){
+      setDisplayExpected(outexp.testcase3.expected);
+    }else if(output==="Testcase-4"){
+      setDisplayExpected(outexp.testcase4.expected);
+    }else if(output==="Testcase-5"){
+      setDisplayExpected(outexp.testcase5.expected);
+    }
+
+    
+
+  }, [output])
+
+ 
+
+
+
   return (
-    <Container>
+    <Container className='h-screen overflow-clip'>
       <Header>
         <Typography variant="h4">Live Coding Battle</Typography>
         <Timer variant="h6">
@@ -424,7 +476,7 @@ function CodeBattlePage() {
         </LeftPanel>
         <RightPanel>
           <Paper elevation={3} style={{ padding: '16px', backgroundColor: '#282a36', color: '#f8f8f2', minHeight: '70%', marginTop: '26%', display: "flex", justifyContent: "space-between" }}>
-            <div className='w-fit'>
+            <div className='w-fit flex flex-col justify-center -mt-1'>
               <div
                 className={`py-3 border-2 my-2 rounded px-2 w-fit flex flex-col cursor-pointer ${output === "Testcase-1" ? "bg-green-800" : ""}`}
                 onClick={() => setOutput("Testcase-1")}
@@ -480,81 +532,48 @@ function CodeBattlePage() {
               )}
               </div>
             </div>
-            <div className='w-10/12'>
-              <div className='my-2'>Input:</div>
-              <Paper style={{ backgroundColor: "gray", minHeight: "10%", maxHeight: "30%", padding: "10px" }}>
-                <Typography variant="h6" style={{ color: "white" }}>
-                  {output === "Testcase-1" ? outexp.testcase1.input.replace('"', '').replace('"', '') : ""}
-                  {output === "Testcase-2" ? outexp.testcase2.input.replace('"', '').replace('"', '') : ""}
-                  {output === "Testcase-3" ? outexp.testcase3.input.replace('"', '').replace('"', '') : ""}
-                  {output === "Testcase-4" ? outexp.testcase4.input.replace('"', '').replace('"', '') : ""}
-                  {output === "Testcase-5" ? outexp.testcase5.input.replace('"', '').replace('"', '') : ""}
-                </Typography>
-              </Paper>
-              <div className='mt-2 mb-1'>Your output:</div>
-              <div style={{ backgroundColor: "gray", minHeight: "20%", maxHeight: "40%" }} className='rounded'>
-                <Typography
-                  variant="h6"
-                  style={{
-                    color: "white",
-                    wordWrap: "break-word", // Wrap text within the container
-                    whiteSpace: "normal", // Allow normal white space handling
-                    overflowY: "auto", // Show a vertical scrollbar if content overflows
-                    padding: "10px",
-                  }}
-                >
+            <div className='w-10/12 flex flex-col justify-start pt-3'>
+              <div className='my-2 text-xl'>Input:</div>
 
-                  {output === "Testcase-1" ? outexp.testcase1.output : ""}
-                  {output === "Testcase-2" ? outexp.testcase2.output : ""}
-                  {output === "Testcase-3" ? outexp.testcase3.output : ""}
-                  {output === "Testcase-4" ? outexp.testcase4.output : ""}
-                  {output === "Testcase-5" ? outexp.testcase5.output : ""}
+              <textarea className='bg-[rgb(128,128,128)] rounded min-h-[10%] max-h-[30%] p-1 z-0 text-xl' value={displayInput}>
 
-                </Typography>
-              </div>
-              <div className='mt-2 mb-1'>Expected output:</div>
-              <div style={{ backgroundColor: "gray", minHeight: "20%", maxHeight: "40%" }} className='rounded'>
-                <Typography variant="h6" style={{
-                  color: "white",
-                  wordWrap: "break-word", // Wrap text within the container
-                  whiteSpace: "normal", // Allow normal white space handling
-                  overflowY: "auto", // Show a vertical scrollbar if content overflows
-                  padding: "10px",
-                }}>
-                  {output === "Testcase-1" ? outexp.testcase1.expected : ""}
-                  {output === "Testcase-2" ? outexp.testcase2.expected : ""}
-                  {output === "Testcase-3" ? outexp.testcase3.expected : ""}
-                  {output === "Testcase-4" ? outexp.testcase4.expected : ""}
-                  {output === "Testcase-5" ? outexp.testcase5.expected : ""}
-                </Typography>
-              </div>
+              </textarea>
+              <div className='mt-2 mb-1 text-xl'>Your output:</div>
 
+
+
+              <textarea className="bg-[rgb(128,128,128)] min-h-[20%] max-h-[40%] rounded p-1 text-xl" value={displayOutput}>
+                
+              </textarea>
+
+              <div className='mt-2 mb-1 text-xl'>Expected output:</div>
+
+              <textarea className="bg-[rgb(128,128,128)] min-h-[20%] max-h-[40%] rounded p-1 text-xl" value={displayExpected}>
+                
+              </textarea>
             </div>
           </Paper>
         </RightPanel>
       </MainContent>
       <Footer>
         <Typography variant="h6">Score: {score}</Typography>
-        <Button
-          style={buttonStyle}
-          variant="contained"
-          startIcon={<Send />}
-          onClick={handleSubmit}
-          className="relative bottom-10"
-        >
-          Submit Code
-        </Button>
-        <Box>
+        <button className='absolute bottom-5 left-[4%] bg-blue-500 cursor-pointer text-xl rounded-md py-1 px-2'  onClick={handleSubmit}>
+          Submit <Send />
+        </button>
+        {/* <Box>
           <Tooltip title="Skip Question">
             <IconButton style={buttonStyle} onClick={handleSkip} disabled={skipCount <= 0} className="relative bottom-10">
               <SkipNext />
             </IconButton>
           </Tooltip>
-        </Box>
+        </Box> */}
+        <button onClick={handleSkip} disabled={skipCount <= 0} className="absolute bottom-5 left-[39%] bg-blue-500 rounded-md text-xl py-1 px-2 cursor-pointer">
+          Skip <SkipNext />
+        </button>
 
         <Typography variant="h6">Skips Left: {skipCount}</Typography>
       </Footer>
-    </Container>
+    </Container> 
   );
 }
 

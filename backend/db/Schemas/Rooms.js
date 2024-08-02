@@ -35,12 +35,8 @@ const roomSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    index: { expires: '10m' } 
+    index: { expires: '2d' } 
   },
-  members: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
   no_of_ready:{
     type: Number,
     default: 0
@@ -48,6 +44,10 @@ const roomSchema = new mongoose.Schema({
   Status: {
     type: String,
     default: 'open to anyone'
+  },
+  ingame:{
+    type: Boolean,
+    default: false
   },
   private:{
     type: Boolean,
@@ -57,9 +57,15 @@ const roomSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
+  roomImg:{
+    type: String
+  },
   current_room_owner:{
     type: String  //i will be storing the socket id of the user
-  }
+  },
+  members:[{
+    type: String
+  }]
 });
 
 const Room = mongoose.model('Room', roomSchema);

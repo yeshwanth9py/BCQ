@@ -33,7 +33,16 @@ mcqRouter.get("/getrandom", async (req, res)=>{
 
 mcqRouter.post("/checkans", async (req, res)=>{
     console.log(req.body)
-    const resp = await MCQ.findById(req.body.id);
+    //error checking with id
+    // let resp = await MCQ.findById(req.body.id);
+    // console.log("resp", resp)
+    // if(!resp){
+    //     console.log("not found", req.body.id)
+    //     resp = await MCQ.findOne({_id: `${req.body.id}`});
+    // }
+
+    const resp = await MCQ.findOne({question:req.body.question});
+    console.log(resp);  
     if(resp.correctAnswer === req.body.ans){
 
         res.json({correct: true, explanation: resp.explanation});

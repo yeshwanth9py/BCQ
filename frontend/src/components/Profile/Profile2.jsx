@@ -48,10 +48,14 @@ const Profile2 = () => {
 
 
   const [timer, setTimer] = useState();
+  const [expanded, setExpanded] = useState(false);
+  
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   const fetchUserStats = async () => {
-    const response = await axios.get(`http://localhost:3000/app/gamestats/${id}`);
+    const response = await axios.get(`http://localhost:3000/app/gamestats/${id}?page=${page}`);
     const data = response.data.gamed;
     setCuid(response.data.uid);
     console.log("user stats", data);
@@ -63,13 +67,21 @@ const Profile2 = () => {
     const data = await response.data;
     console.log("profile", data);
     setProfile(data[0]);
+    setTotalPages(Math.ceil(data[0].previousGames.length/10));
     setStatus("success");
   };
 
   useEffect(() => {
     fetchProfile();
-    fetchUserStats();
+    // fetchUserStats();
+    setTimeout(() => {
+      setExpanded(true)
+    }, 1000);
   }, []);
+
+  useEffect(() => {
+    fetchUserStats();
+  },[page]);
 
   useEffect(() => {
     if (animate) {
@@ -84,6 +96,8 @@ const Profile2 = () => {
       setFollowCount(profile.followers.length);
     }
   }, [profile]);
+
+
 
   const sendLike = async () => {
     if (liked) {
@@ -163,7 +177,7 @@ const Profile2 = () => {
       const savedroom = await axios.post("http://localhost:3000/app/rooms/create", challengeData, { withCredentials: true });
       console.log(savedroom.data.room);
       console.log("room created")
-      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room }, {withCredentials: true});
+      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room }, { withCredentials: true });
       console.log("res for challenge", res);
       socket.emit("notification", ({ bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic }));
       setTimer(4);
@@ -202,16 +216,16 @@ const Profile2 = () => {
 
 
   async function searchUsers(searchTerm) {
-    try{
+    try {
       console.log("inside search")
       const response = await axios.get(`http://localhost:3000/app/profile/search/${searchTerm}`);
       console.log("response", response);
       return response.data
-    } catch(err){
+    } catch (err) {
       console.log(err);
       return []
     }
-    
+
   }
 
   // const [searchTerm, setSearchTerm] = useState("");
@@ -245,19 +259,19 @@ const Profile2 = () => {
                 placeholder='&#128269;Search for other user...'
                 onInput={e => handleSearch(e)}
               />
-                  
+
               {display && (
                 <div className='absolute top-24 right-44 rounded-lg outline-none px-2 py-1 border-2 border-gray-300 shadow-slate-900 shadow-md bg-slate-400 w-[12.6rem]'>
                   {searchResults?.length > 0 ? (
                     searchResults?.map((result, index) => (
                       <div key={index} className='py-1 px-2 border-b border-gray-300'>
-                        <div className='flex cursor-pointer gap-2' onClick={()=>{
+                        <div className='flex cursor-pointer gap-2' onClick={() => {
                           setDisplay(false);
                           console.log(result.username);
-                          navigate(`/home/profile/`+result.username);
+                          navigate(`/home/profile/` + result.username);
                           window.location.reload();
                         }}
-                        ><img src={result.profilePic} width={30} height={30} className='rounded-full'/> {result.username}</div>
+                        ><img src={result.profilePic} width={30} height={30} className='rounded-full' /> {result.username}</div>
                       </div>
                     ))
                   ) : (
@@ -320,7 +334,7 @@ const Profile2 = () => {
           </div>
 
 
-          <Accordion style={{ padding: "0px", margin: "0px" }}>
+          <Accordion expanded={expanded} style={{ padding: "0px", margin: "0px" }}>
             <AccordionSummary
 
               style={{ padding: "0px", margin: "0px" }}
@@ -360,10 +374,10 @@ const Profile2 = () => {
                         }
                       }}>
                         <div className="text-center px-6 py-4 flex justify-center items-center">{game.gametype || "MCQ Type"}</div>
-                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.roomno}</div>
-                        <div className="text-center px-6 py-2 flex justify-center items-center">{Object.keys(game.data).length}</div>
-                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.winner}</div>
-                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.maxsc}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.roomno || "not found"}</div>
+                        <div className="text-center px-6 py-2 flex justify-center items-center">{Object.keys(game.data).length || 0}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.winner || "None"}</div>
+                        <div className="text-center px-6 py-4 flex justify-center items-center">{game.maxsc || 0}</div>
                         {console.log("curruid", curruid)}
                         <div className="text-center px-6 py-4 flex justify-center items-center">{curruid ? game.data[curruid].score : 0}</div>
                         <div className="text-center px-6 py-4 flex justify-center items-center">
@@ -384,10 +398,10 @@ const Profile2 = () => {
                         return (
                           <div className="grid grid-cols-6" style={{ marginRight: "-29px" }}>
                             <div className="text-center px-16 py-4 flex justify-center items-center" style={{ marginRight: "-10px" }}>{key}</div>
-                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].username}</div>
-                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].score}</div>
-                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].attempted}</div>
-                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].correct}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].username || "not found"}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].score || "0"}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].attempted || "0"}</div>
+                            <div className="text-center px-6 py-4 flex justify-center items-center">{game.data[key].correct || "0"}</div>
                             <div className="text-center px-10 py-4 flex justify-center items-center">{convertToTime(game.toi)}</div>
                           </div>
                         )
@@ -402,6 +416,29 @@ const Profile2 = () => {
 
           </Accordion>
         </div>}
+      <div className='flex justify-center items-center my-5'>
+        <button
+          className={`mx-2 px-4 py-2 rounded-lg transition duration-300 ${page === 1 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+          onClick={()=>{
+            setPage(page - 1);
+          }}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+        <span className='mx-2 px-4 py-2 rounded-lg bg-gray-200 text-gray-700'>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          className={`mx-2 px-4 py-2 rounded-lg transition duration-300 ${page === totalPages ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+          onClick={()=>{
+            setPage(page + 1);
+          }}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
+      </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Create a New Challenge</DialogTitle>
         <DialogContent>

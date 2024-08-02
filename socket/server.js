@@ -84,6 +84,7 @@ io.on("connection", (socket) => {
         // if there is atleast 1 user in witing room then send a req to the first user in the waiting room
 
         if (allwaitingrooms[data.roomno] && Object.keys(allwaitingrooms[data.roomno]).length > 0) {
+            console.log("req sent to owner")
             io.to(allwaitingrooms[data.roomno][Object.keys(allwaitingrooms[data.roomno])[0]].socketid).emit("request_join_room_owner", { ...data, requestsocketid: socket.id });
         } else {
             socket.emit("response_join_room", data);
@@ -93,6 +94,7 @@ io.on("connection", (socket) => {
 
     socket.on("request_join_room_owner_accept", (data) => {
         // socket.join(data.roomno);
+        
 
         io.to(data.requestsocketid).emit("response_join_room", data);
 
@@ -132,6 +134,7 @@ io.on("connection", (socket) => {
                 isReady: true
             }
         };
+        
         // console.log(allwaitingrooms);
         io.to(data.roomno).emit("readyb", allwaitingrooms[data.roomno]);
     });

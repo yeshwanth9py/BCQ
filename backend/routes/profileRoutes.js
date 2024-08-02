@@ -46,6 +46,7 @@ profileRouter.patch("/update/:id", auth, async (req, res) => {
 profileRouter.get("/:pnm", async (req, res) => {
     try {
         const profile = await Profile.find({ username: req.params.pnm });
+        // const profile = await Profile.findOne({ username: req.params.pnm }, { previousgames: { $slice: 20 } });
         res.status(200).json(profile);
     } catch (error) {
         res.status(500).json({ error: error.message });

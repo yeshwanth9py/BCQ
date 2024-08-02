@@ -31,6 +31,7 @@ import { useSocket } from '../SocketContext/SocketContext';
 
 
 const Home = () => {
+  
 
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState('');
@@ -46,6 +47,7 @@ const Home = () => {
   const [searchsubmit, setSearchSubmit] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [passwordentered, setpasswordentered] = useState("");
 
 
   const handleOpenModal = () => setShowModal(true);
@@ -109,7 +111,9 @@ const Home = () => {
 
   useEffect(() => {
     axios.get("http://localhost:3000/app/user/isLoggedIn", { withCredentials: true }).then((res) => {
-      if (res.success == false) {
+      console.log("profile:-", res.data);
+    }).catch((err)=>{
+      if(!err?.response?.success){
         alert("please login");
         navigate("/login");
       }
@@ -164,10 +168,10 @@ const Home = () => {
 
     socket.on("response_join_room", (data) => {
 
-      console.log(data);
+      console.log("data",data);
       // console.log(roomno);
       try {
-        axios.post("http://localhost:3000/app/rooms/join", { roomno: data.roomno, uid: localStorage.getItem("ccpid") }, { withCredentials: true }).then((res) => {
+        axios.post("http://localhost:3000/app/rooms/join", { roomno: data.roomno, uid: localStorage.getItem("ccpid"), passwordentered:{passwordentered} }, { withCredentials: true }).then((res) => {
           navigate(`/home/room/${data.roomno}`, { state: { roomno: data.roomno } });
         });
         
@@ -185,12 +189,11 @@ const Home = () => {
 
 
   function joinRoom(roomno) {
+    
+    
     // first get the socket id of the room owner and send the join request
     //if successfull send the room no as well to join
-
-
     socket.emit("request_join_room", { roomno: roomno, ccuid: localStorage.getItem("ccuid"), ccusername: localStorage.getItem("ccusername") });
-    
   }
 
   async function removenotification() {
@@ -201,7 +204,6 @@ const Home = () => {
     const updatedp = await axios.patch("http://localhost:3000/app/profile/notifications", { username: localStorage.getItem("ccusername") });
     console.log("updated ", updatedp);
     // }
-
   }
 
   function createQuickMatch() {
@@ -210,8 +212,12 @@ const Home = () => {
       navigate(`/home/room/${res.data.roomid}`, { state: { roomno: res.data.roomid } });
     })
       .catch((err) => {
+        if(err?.response?.status == 401){
+          alert("please login");
+          navigate("/login");
+        }
         console.log(err);
-        navigate("/login");
+        // navigate("/login");
       })
   }
 
@@ -244,11 +250,11 @@ const Home = () => {
               </Button>
             </div>
             <div className='m-10'>
-              <h1 className='text-2xl font-bold underline-offset-4'>Join An Existing Room:-</h1>
-              <div className="max-h-[80vh] overflow-y-auto">
+              <h1 className='text-2xl font-bold underline-offset-4 mb-2'>Join An Existing Room:-</h1>
+              <div className="max-h-[80vh] overflow-y-auto grid grid-cols-2 gap-4">
                 {rooms.length == 0 && <p className='text-center mt-10'>No rooms available currently, no worries you can create one :)</p>}
                 {rooms.map((room, ind) => (
-                  <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom} />
+                  <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom} setpasswordentered={setpasswordentered} />
                 ))}
               </div>
             </div>

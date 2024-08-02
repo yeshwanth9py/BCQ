@@ -3,11 +3,8 @@ import { Drawer, IconButton, List, ListItem, ListItemText, ListItemAvatar, Avata
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/system';
-import {useNavigate} from 'react-router-dom';
-
-
+import { useNavigate } from 'react-router-dom';
 import { IoLogoSnapchat } from "react-icons/io";
-
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   '.MuiDrawer-paper': {
@@ -22,7 +19,6 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
   };
@@ -31,9 +27,7 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
     if (isOpen) {
       setUnreadnotifications(0);
     }
-  }, [isOpen])
-
-
+  }, [isOpen]);
 
   return (
     <>
@@ -42,21 +36,28 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
       </IconButton>
       <StyledDrawer anchor="right" open={isOpen} onClose={toggleDrawer}>
         <div className="flex flex-col h-full">
+          <div className="flex flex-col items-center p-4 bg-gray-800">
+            <h2 className="text-white font-bold text-lg">Welcome to Global Chat</h2>
+          </div>
           <div className="flex-grow overflow-y-auto p-4">
             <List>
               {messages.map((msg, index) => (
                 <ListItem key={index} className="text-white">
                   <ListItemAvatar>
-                    <Avatar src={msg.profilepic} className='cursor-pointer' onClick={()=>navigate(`/home/profile/`+(msg.sender=="You"?`${localStorage.getItem("ccusername")}`:msg.sender))}>{msg.sender.charAt(0)}</Avatar>
+                    <Avatar 
+                      src={msg.profilepic} 
+                      className='cursor-pointer' 
+                      onClick={() => navigate(`/home/profile/${msg.sender === "You" ? localStorage.getItem("ccusername") : msg.sender}`)}
+                    >
+                      {msg.sender.charAt(0)}
+                    </Avatar>
                   </ListItemAvatar>
-                  {console.log(msg)}
                   <ListItemText
                     primary={msg.text}
                     secondary={`${msg.sender} - ${msg.timestamp}`}
                   />
                 </ListItem>
               ))}
-
             </List>
           </div>
           <div className="p-4 bg-gray-900">
@@ -73,7 +74,7 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
                     setMessage('');
                   }
                 }}
-                placeholder="Send a msg to everyone"
+                placeholder="Send a message to everyone"
                 InputProps={{
                   className: 'bg-white',
                 }}
@@ -83,12 +84,11 @@ const SidebarChat = ({ messages, setMessages, handleSendMessage, setUnreadnotifi
                 color="primary"
                 className="ml-2"
                 onClick={() => {
-                  console.log(localStorage.getItem("ccusername"))
-                  if(localStorage.getItem("ccusername")==null){
+                  if (localStorage.getItem("ccusername") == null) {
                     alert("Please Login First");
                     navigate("/login");
                   }
-                  handleSendMessage(message)
+                  handleSendMessage(message);
                   setMessage('');
                 }}
               >

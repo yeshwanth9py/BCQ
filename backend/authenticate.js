@@ -6,7 +6,7 @@ const auth = (req, res, next)=>{
         const token = req.cookies.token || req.headers["auth-token"];
         console.log("token:- ",token)
         if(!token){
-            return res.status(400).json({
+            return res.status(401).json({
                 msg: "user is not authenticated",
                 success: false
             });

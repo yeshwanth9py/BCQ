@@ -9,16 +9,22 @@ export default function MyClock() {
 
   const [minutes, setMinutes] = useState(1);
   const [seconds, setSeconds] = useState(0);
+
   const [score, setScore] = useState(0);
   const [questions, setQuestions] = useState({});
   const [attempted, setAttempted] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [explanation, setExplanation] = useState("");
   const [exptimer, setExptimer] = useState(-1);
-  const [otherScores, setOtherScores] = useState([]); 
+  const [otherScores, setOtherScores] = useState([]);
+
+
+  const [prevdata, setprevdata] = useState([]);
 
 
   const choiceRefs = useRef([]);
+
+  const [disableOptions, setDisableOptions] = useState(false);
 
 
 
@@ -60,23 +66,30 @@ export default function MyClock() {
     console.log('Connected to socket game server', socket.id);
 
     socket.on("readscore", (data) => {
-      console.log("someone scored:",data);
+      console.log("someone scored:", data);
       // for(let user of data){
 
       // }
 
 
-      let temp = []
+      let temp = [];
       for (let user of Object.keys(data)) {
         temp.push({
           user: data[user]
         })
       }
+      console.log("temp", temp)
 
-      setOtherScores([...otherScores, ...temp]);
+      temp.sort((a, b) => {
+
+        return -a.user.score + b.user.score;
+      });
+      console.log("temp after sorting", temp);
+
+      setOtherScores(temp);
     });
 
-    socket.on("user-disc", (data)=>{
+    socket.on("user-disc", (data) => {
       console.log(data);
       console.log(data.ccuid, "has disconnected", data.roomno);
     });
@@ -91,12 +104,47 @@ export default function MyClock() {
   }, []);
 
   useEffect(() => {
+    async function getroomdata() {
+      try {
+        const res = await axios.get("http://localhost:3000/app/rooms/" + roomno);
+        console.log("roomdata", res.data);
+        //must set timer
+        const timer = res.data.room.timeLimit;
+
+        const mins = Math.floor(timer / 60);
+        const secs = timer % 60;
+        setMinutes(mins);
+        setSeconds(secs);
+
+      } catch (err) {
+        console.log(err);
+        alert("room does not exist");
+        // navigate("/home");
+      }
+    }
+
+    getroomdata();
+  }, [])
+
+  useEffect(() => {
     const id = setInterval(decrementTime, 100);
     return () => clearInterval(id);
   }, []);
 
+// is currently in test
+  useEffect(() => {
+    if (minutes < 0 || !minutes) {
+      setTimeout(() => {
+        navigate("/gameover/" + roomno, { state: { prevdata: prevdata } });
+        return;
+      }, 2000)
+    }
+  }, [prevdata]);
+
   async function getmcqs() {
+
     const allmcqs = await axios.get("http://localhost:3000/app/mcqs/getrandom");
+    setDisableOptions(false)
     setQuestions(allmcqs.data);
     setExplanation("");
     resetChoiceColors();
@@ -113,14 +161,14 @@ export default function MyClock() {
   function updatescore() {
     setScore(prevScore => {
       const newScore = prevScore + 1;
-      setAttempted((prevAttempted )=> {
-        socket.emit("updatescore", { score: newScore, ccuid: localStorage.getItem("ccuid"), roomno, attempted: prevAttempted+1, correct: correct+1 });
+      setAttempted((prevAttempted) => {
+        socket.emit("updatescore", { score: newScore, ccuid: localStorage.getItem("ccuid"), roomno, attempted: prevAttempted + 1, correct: correct + 1 });
         return prevAttempted + 1
       });
       return newScore;
     });
 
-    setCorrect(correct+1);
+    setCorrect(correct + 1);
   }
 
   function decrementTime() {
@@ -129,12 +177,16 @@ export default function MyClock() {
         setMinutes(minutes => {
           if (minutes === 0) {
             console.log("game ended");
-            navigate("/gameover/" + roomno);
+            console.log("prevdata", prevdata);
+            axios.patch("http://localhost:3000/app/rooms/finish/" + roomno, { roomno: roomno, username: localStorage.getItem("ccusername") });
+            // navigate("/gameover/" + roomno, { state: { prevdata: prevdata } });
+            return;
           } else {
             return minutes - 1;
           }
         });
         return 59;
+
       } else {
         return seconds - 1;
       }
@@ -142,21 +194,47 @@ export default function MyClock() {
   }
 
   const check = async (e) => {
-    let ans = e.target.textContent.slice(3);
-    console.log(ans, questions.id);
-    const res = await axios.post("http://localhost:3000/app/mcqs/checkans", { id: questions.id, ans });
-    console.log(res.data)
-    if (res.data.correct) {
-      e.target.className = "bg-green-500 rounded-lg m-4 cursor-pointer p-4";
-      updatescore();
-    } else {
-      e.target.className = "bg-red-500 rounded-lg m-4 cursor-pointer p-4";
+
+    if(!disableOptions){
+      let ans = e.target.textContent.slice(3);
+      console.log(ans, questions.id);
+
+      console.log("questions", questions);
+
+      //error sending id
+      // const res = await axios.post("http://localhost:3000/app/mcqs/checkans", { id: questions.id, ans });
+      const res = await axios.post("http://localhost:3000/app/mcqs/checkans", { id: questions.id, question: questions.question, ans });
+      console.log("res.data", res.data)
+
+      if (res.data.correct) {
+        // bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4 
+        console.log("ghjkl",e.target);
+        e.target.className = "bg-green-500 rounded-lg m-4 cursor-pointer p-4 w-full mx-auto";
+        updatescore();
+      } else {
+        e.target.className = "bg-red-500 rounded-lg m-4 cursor-pointer p-4";
+      }
+
+      
+
+      runexptimer();
+
+      setExplanation(res.data.explanation);
+
+
+      setprevdata((prevdata) => {
+        return { ...prevdata, [questions.id]: { ...questions, user_ans: ans, explanation: res.data.explanation, correct: res.data.correct } };
+      });
+      setDisableOptions(true)
+
+      setTimeout(() => {
+        console.log("prevdata", prevdata, "minutes", minutes);
+        getmcqs();
+        setDisableOptions(false);
+      }, 4000);
+    }else{
+      return
     }
-    setExplanation(res.data.explanation);
-    runexptimer();
-    setTimeout(() => {
-      getmcqs();
-    }, 4000);
   };
 
   function runexptimer() {
@@ -194,23 +272,24 @@ export default function MyClock() {
 
       {/* Question and Options */}
       <Grid item xs={12}>
-        <Card>
+        <Card className='border-2'>
           <CardContent>
             <Typography variant="h5" className="font-bold text-4xl text-center">{questions.question}</Typography>
-            <div>
-              {questions.options.map((option, index) => (
-                <div
-                  key={index}
-                  ref={el => choiceRefs.current[index] = el}
-                  className="bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4"
-                  onClick={check}
-                >
-                  {String.fromCharCode(97 + index)}) {option}
-                </div>
-              ))}
-            </div>
-            <Typography variant="body1">{explanation}</Typography>
-            {exptimer >= 0 && <Typography variant="h6">{exptimer}</Typography>}
+          
+              <div className='w-[50%] mx-auto'>
+                {questions.options.map((option, index) => (
+                  <div
+                    key={index}
+                    ref={el => choiceRefs.current[index] = el}
+                    className={`bg-cyan-300 rounded-lg m-4 cursor-pointer hover:bg-blue-500 p-4 w-full mx-auto`}
+                    onClick={check}
+                  >
+                    {String.fromCharCode(97 + index)}) {option}
+                  </div>
+                ))}
+              </div>
+            <div className='text-center'>{explanation}</div>
+            {exptimer >= 0 && <div className='text-center text-xl mt-2'><span className='w-fit rounded-[50%] px-3 py-1 border bg-sky-200'>{exptimer}</span></div>}
           </CardContent>
         </Card>
       </Grid>
@@ -219,27 +298,26 @@ export default function MyClock() {
       <Grid item xs={12}>
         <Card>
           <CardContent>
-            <Typography variant="h5">Leaderboard</Typography>
+            <Typography variant="h5" className='mx-auto text-center '>Live Leaderboard</Typography>
             {otherScores.map((use, index) => {
               let temp3 = Object.keys(use)
-              for(let user of temp3){
+              for (let user of temp3) {
                 return (
-                    <Grid container alignItems="center" key={index} spacing={2}>
-                      <Grid item>
-                        <Avatar src={use[user].avatar} alt={use[user].username} />
-                      </Grid>
-                      <Grid item xs>  
-                        <Typography variant="body1">{use[user].username}</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="h6" color="secondary">
-                          {use[user].score}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                      )
-                    }
-                  })}
+                  <div key={index} className="flex items-center space-x-4 hover:space-x-8 cursor-pointer my-2 w-[50%] mx-auto">
+                    <span className="text-2xl text-primary hover:scale-125">{index + 1}.</span>
+                    <div>
+                      <img src={use[user].avatar} alt={use[user].username} className="w-10 h-10 rounded-full border-solid border-stone-950 border-t-2 hover:scale-110" />
+                    </div>
+                    <div className="flex-grow">
+                      <p className="text-lg">{use[user].username}</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl text-secondary hover:scale-125">{use[user].score}</p>
+                    </div>
+                  </div>
+                )
+              }
+            })}
           </CardContent>
         </Card>
       </Grid>

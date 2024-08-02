@@ -7,23 +7,39 @@ const gameStatsRouter = express.Router();
 
 
 gameStatsRouter.get("/:id", async (req, res) => {
-    try{
-        console.log("came")
-        const uname = req.params.id;
-        const userDetails = await User.findOne({ username: uname });
-        const pid = userDetails.profile;
-        const profiled = await Profilemodel.findOne({ _id: pid })
-        .populate({
-          path: 'previousGames',
-          options: { sort: { toi: -1 } }
-        });
-        console.log(profiled);
-        res.json({gamed:profiled.previousGames, uid:userDetails._id});
-    } catch(err){
-        console.error(err);
-        return res.status(400).json(err);
+    try {
+      const uname = req.params.id;
+      const page = parseInt(req.query.page) || 1; // Get the page number from query params, default to 1 if not provided
+      console.log("oage", page)
+      const limit = 10; // Number of items per page
+      const skipCount = (page) * limit; // Calculate the number of items to skip
+  
+      const userDetails = await User.findOne({ username: uname });
+      const pid = userDetails.profile;
+  
+      const profiled = await Profilemodel.aggregate([
+        { $match: { _id: pid } },
+        {
+          $project: {
+            previousGames: { $slice: ["$previousGames", skipCount, limit] }
+          }
+        }
+      ]).exec();
+  
+      // Populate the previousGames array with additional data
+      const populatedGames = await Profilemodel.populate(profiled, {
+        path: 'previousGames',
+        options: { sort: { toi: -1 } } // Sort options, adjust as needed
+      });
+  
+      console.log(populatedGames);
+      res.json({ gamed: populatedGames[0].previousGames, uid: userDetails._id });
+    } catch (err) {
+      console.error(err);
+      return res.status(400).json(err);
     }
-});
+  });
+  
 
 
 gameStatsRouter.post("/", async (req, res) => {

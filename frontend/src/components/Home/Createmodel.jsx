@@ -97,6 +97,7 @@ const BasicModal = ({ open, handleClose }) => {
             {/* Add other game types here */}
           </Select>
         </FormControl>
+
         <TextField
           fullWidth
           margin="dense"
@@ -108,6 +109,7 @@ const BasicModal = ({ open, handleClose }) => {
           onChange={handleChange}
           inputProps={{ min: 1 }}
         />
+        
         {/* <TextField
           fullWidth
           margin="dense"
@@ -155,9 +157,9 @@ const BasicModal = ({ open, handleClose }) => {
             <MenuItem value="Web Development">Web Development</MenuItem>
             <MenuItem value="General Knowledge">MCQ Battle</MenuItem>
             <MenuItem value="Competitive Programming">Competitive Programming</MenuItem>
-            <MenuItem value="Science">Science</MenuItem>
-            <MenuItem value="Mathematics">Mathematics</MenuItem>
-            <MenuItem value="Networking">Networking</MenuItem>
+            <MenuItem value="Science">Space</MenuItem>
+            <MenuItem value="Mathematics">Puzzles</MenuItem>
+            
           </Select>
         </FormControl>
 
@@ -172,7 +174,21 @@ const BasicModal = ({ open, handleClose }) => {
           multiline
           rows={2}
         />
-        {/* <FormControlLabel
+
+
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Room Password"
+          variant="outlined"
+          type="password"
+          name="roomPassword"
+          value={formdetails.roomPassword}
+          disabled={!formdetails.isPrivate}
+          onChange={handleChange}
+        /> 
+
+        <FormControlLabel
           control={
             <Checkbox
               name="isPrivate"
@@ -181,7 +197,11 @@ const BasicModal = ({ open, handleClose }) => {
             />
           }
           label="Private Room"
-        /> */}
+        />
+
+         
+
+
         <Button variant="contained" color="primary" disabled={disabled} onClick={handleSubmit} sx={{ mt: 2 }}> Create </Button>
         
       </Box>

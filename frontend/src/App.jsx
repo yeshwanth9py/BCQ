@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import './App.css'
 import Home from './components/Home.jsx'
 import Login from './components/Login'
@@ -21,7 +21,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/home" element={<Navigate to="/" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home/room/:id" element={<GameRoom/>}/>
