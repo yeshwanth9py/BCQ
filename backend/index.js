@@ -48,14 +48,14 @@ app.use(cors(corsOptions));
 
 
 app.use(express.json());
-// app.use(cookieParser(
-//     {
-//         httpOnly: true,
-//         secure: false
-//     }
-// ));
+app.use(cookieParser(
+    {
+        httpOnly: true,
+        secure: true
+    }
+));
 
-app.use(cookieParser());  
+
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
