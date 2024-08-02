@@ -109,9 +109,10 @@ const Home = () => {
     axios.get("http://localhost:3000/app/user/isLoggedIn", { withCredentials: true }).then((res) => {
       console.log("profile:-", res.data);
     }).catch((err)=>{
+      console.log(err)
       if(!err?.response?.success){
         alert("please login");
-        navigate("/login");
+        // navigate("/login");
       }
     })
   }, [])
