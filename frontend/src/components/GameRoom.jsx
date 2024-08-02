@@ -127,7 +127,13 @@ const GameRoom = () => {
 
   const exitroom = () => {
     try{
-      axios.post("http://localhost:3000/app/rooms/exitroom", { roomno: params.id, uid: localStorage.getItem("ccpid") }, {withCredentials: true}).then(()=>{
+      axios.post("http://localhost:3000/app/rooms/exitroom", { roomno: params.id, uid: localStorage.getItem("ccpid") }, {
+        withCredentials: true,
+        headers: {
+          'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+          'Content-Type': 'application/json' // Include other headers as needed
+        }
+      }).then(()=>{
         socket.emit("user-disconnect", { roomno: params.id, ccuid: localStorage.getItem("ccuid") });
         navigate("/");
       })

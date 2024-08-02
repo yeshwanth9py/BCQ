@@ -34,7 +34,11 @@ const BasicModal = ({ open, handleClose }) => {
     try {
       console.log("form before submitting",formdetails);
       axios.post("http://localhost:3000/app/rooms/create", formdetails, {
-        withCredentials: true
+        withCredentials: true,
+        headers: {
+          'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+          'Content-Type': 'application/json' // Include other headers as needed
+        }
       }).then((resp) => {
         console.log(resp);
         handleClose();

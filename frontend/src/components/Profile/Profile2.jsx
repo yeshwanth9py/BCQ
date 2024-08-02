@@ -175,10 +175,22 @@ const Profile2 = () => {
         categories,
         createdBy: localStorage.getItem("ccusername")
       };
-      const savedroom = await axios.post("http://localhost:3000/app/rooms/create", challengeData, { withCredentials: true });
+      const savedroom = await axios.post("http://localhost:3000/app/rooms/create", challengeData, {
+        withCredentials: true,
+        headers: {
+          'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+          'Content-Type': 'application/json' // Include other headers as needed
+        }
+      });
       console.log(savedroom.data.room);
       console.log("room created")
-      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room }, { withCredentials: true });
+      const res = await axios.post("http://localhost:3000/app/profile/challenge", { bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic, savedroom: savedroom.data.room }, {
+        withCredentials: true,
+        headers: {
+          'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+          'Content-Type': 'application/json' // Include other headers as needed
+        }
+      });
       console.log("res for challenge", res);
       socket.emit("notification", ({ bypid: localStorage.getItem("ccpid"), byname: localStorage.getItem("ccusername"), topid: profile._id, date: Date.now(), profilepic: profile.profilePic }));
       setTimer(4);
