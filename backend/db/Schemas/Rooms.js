@@ -65,8 +65,15 @@ const roomSchema = new mongoose.Schema({
     type: String  //i will be storing the socket id of the user
   },
   members:[{
-    type: String
+    type: String,
   }]
+
+});
+
+roomSchema.pre('save', function (next) {
+  const uniqueMembers = [...new Set(this.members)];
+  this.members = uniqueMembers;
+  next();
 });
 
 const Room = mongoose.model('Room', roomSchema);

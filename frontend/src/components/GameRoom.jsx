@@ -24,6 +24,7 @@ const GameRoom = () => {
   const [messages, setMessages] = useState([]);
 
   const [chatExpanded, setChatExpanded] = useState(true);
+  const [maxPlayers, setMaxPlayers] = useState(2);
 
 
   const navbarStyle = {
@@ -108,10 +109,25 @@ const GameRoom = () => {
       return () => clearInterval(timer);
     }
 
-    // return ()=>{
-    //   exitroom();
-    // }
+    return ()=>{
+      console.log(window.location);
+      // exitroom();
+    }
   }, [ctr]);
+
+  useEffect(()=>{
+    async function getroomdata(){
+      await axios.get("http://localhost:3000/app/rooms/"+params.id).then((res)=>{
+        console.log("room data:",res.data);
+        setMaxPlayers(res.data.room.numPlayers);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    }
+
+    getroomdata();
+  })
 
   const gamedetails = ["Solo", "Duo", "Trio", "Quartet", "Quintet", "Sextet", "Septet", "Octet"];
 
@@ -162,7 +178,7 @@ const GameRoom = () => {
         {console.log(allusers)}
         Min no of players - 2
         <br />
-        Max no of players - 8
+        Max no of players - {maxPlayers}
       </div>
       <div className='flex justify-evenly mt-20 w-full px-20'>
         {alluserids.map((userid, index) => (

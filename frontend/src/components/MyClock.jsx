@@ -38,7 +38,7 @@ export default function MyClock() {
 
   // console.log(params)
 
-
+  let id;
   useEffect(() => {
 
 
@@ -132,21 +132,17 @@ export default function MyClock() {
   }, [])
 
   useEffect(() => {
-    const id = setInterval(decrementTime, 100);
+    setInterval(decrementTime, 1000);
     return () => clearInterval(id);
   }, []);
 
 // is currently in test
   useEffect(() => {
-    if (minutes < 0 || !minutes) {
-      setTimeout(() => {
-        navigate("/gameover/" + roomno, { state: { prevdata: prevdata } });
-        return;
-      }, 2000)
-    }
+    sessionStorage.setItem("prevdata", JSON.stringify(prevdata));
   }, [prevdata]);
 
   async function getmcqs() {
+    try{
 
     if(!category){
 
@@ -156,14 +152,18 @@ export default function MyClock() {
       setExplanation("");
       resetChoiceColors();
     }else{
-      console.log("fetching the cat one only");
+      console.log("fetching the cat one only of ",category);
       const allmcqs = await axios.get("http://localhost:3000/app/mcqs/category?category="+category);
       setDisableOptions(false)
       setQuestions(allmcqs.data);
       setExplanation("");
       resetChoiceColors();
     }
+  } catch(err){
+    console.log(err);
+    alert("dsome error occured");
   }
+}
 
   function resetChoiceColors() {
     choiceRefs.current.forEach(ref => {
@@ -194,7 +194,10 @@ export default function MyClock() {
             console.log("game ended");
             console.log("prevdata", prevdata);
             axios.patch("http://localhost:3000/app/rooms/finish/" + roomno, { roomno: roomno, username: localStorage.getItem("ccusername") });
-            // navigate("/gameover/" + roomno, { state: { prevdata: prevdata } });
+            navigate("/gameover/" + roomno, { state: { prevdata: prevdata } });
+            clearInterval(id);
+            setMinutes(0);
+            setSeconds(0);
             return;
           } else {
             return minutes - 1;
@@ -244,7 +247,7 @@ export default function MyClock() {
 
       setTimeout(() => {
         console.log("prevdata", prevdata, "minutes", minutes);
-        getmcqs();
+        getmcqs()
         setDisableOptions(false);
       }, 4000);
     }else{
@@ -254,10 +257,10 @@ export default function MyClock() {
 
   function runexptimer() {
     setExptimer(3);
-    const id = setInterval(() => setExptimer(prev => prev - 1), 1000);
+    const id2 = setInterval(() => setExptimer(prev => prev - 1), 1000);
     setTimeout(() => {
       setExptimer(-1);
-      clearInterval(id);
+      clearInterval(id2);
     }, 4000);
   }
 
