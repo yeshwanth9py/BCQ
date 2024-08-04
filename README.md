@@ -1,7 +1,7 @@
 # BCQ
 Battle Choice Question(V1)
 
-# Code Combat
+# Code Combat(V2)
 
 Code Combat is an application where users can engage in live MCQ battles and live coding battles. This README provides an overview of the application's features and how it works.
 
@@ -59,7 +59,7 @@ To run the application locally, follow these steps:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/code-combat.git
+    git clone https://github.com/yeshwanth9py/BCQ.git
     ```
 2. Install dependencies for the front end, back end, and socket server:
     ```bash
