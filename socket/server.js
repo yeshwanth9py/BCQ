@@ -21,12 +21,20 @@ const allwaitingrooms = {};
 const toi = {};
 const onlineusers = {};
 
+// const io = socketIo(server, {
+//     cors: {
+//         origin: "http://localhost:5173",
+//         credentials: true
+//     }
+// });
+
 const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "*",
         credentials: true
     }
 });
+
 
 const DATA_EXPIRY_TIME = 60 * 1000; // 10 SECONDS
 let tid;

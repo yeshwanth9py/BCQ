@@ -107,12 +107,17 @@ const Home = () => {
   }
 
   useEffect(() => {
-    axios.get("http://localhost:3000/app/user/isLoggedIn", { withCredentials: true }).then((res) => {
-      console.log("profile:-", res.data);
+    axios.get("http://localhost:3000/app/user/isLoggedIn", {
+      withCredentials: true,
+      headers: {
+        'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+        'Content-Type': 'application/json' // Include other headers as needed
+      }
     }).catch((err)=>{
+      console.log(err)
       if(!err?.response?.success){
         alert("please login");
-        navigate("/login");
+        // navigate("/login");
       }
     })
   }, [])
@@ -189,7 +194,13 @@ const Home = () => {
       console.log("data",data);
       // console.log(roomno);
       try {
-        axios.post("http://localhost:3000/app/rooms/join", { roomno: data.roomno, uid: localStorage.getItem("ccpid"), passwordentered:{passwordentered} }, { withCredentials: true }).then((res) => {
+        axios.post("http://localhost:3000/app/rooms/join", { roomno: data.roomno, uid: localStorage.getItem("ccpid"), passwordentered:{passwordentered} }, {
+          withCredentials: true,
+          headers: {
+            'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+            'Content-Type': 'application/json' // Include other headers as needed
+          }
+        }).then((res) => {
           navigate(`/home/room/${data.roomno}`, { state: { roomno: data.roomno } });
         });
         
@@ -225,7 +236,13 @@ const Home = () => {
   }
 
   function createQuickMatch() {
-    axios.get("http://localhost:3000/app/rooms/quickmatch", { withCredentials: true }).then((res) => {
+    axios.get("http://localhost:3000/app/rooms/quickmatch", {
+      withCredentials: true,
+      headers: {
+        'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+        'Content-Type': 'application/json' // Include other headers as needed
+      }
+    }).then((res) => {
       console.log("kkk", res.data);
       navigate(`/home/room/${res.data.roomid}`, { state: { roomno: res.data.roomid } });
     })

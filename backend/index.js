@@ -18,19 +18,27 @@ const codeCombatRouter = require("./routes/codeCombatRouter");
 
 connectdb();
 
-app.use(cors(
-    {
-        origin: "http://localhost:5173",
-        credentials: true
-    }
-))
+// app.use(cors(
+//     {
+//         origin: "http://localhost:5173",
+//         credentials: true
+//     }
+// ))
+
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow any origin
+        callback(null, true);
+    },
+    credentials: true // Enable credentials for cookies
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json());
-app.use(cookieParser(
-    {
-        httpOnly: true,
-        secure: false
-    }
-));
+app.use(cookieParser());
+
 
 
 const apiLimiter = rateLimit({

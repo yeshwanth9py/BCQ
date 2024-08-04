@@ -23,7 +23,13 @@ export default function MultiActionAreaCard({ room, joinRoom, setpasswordentered
 
   
 function deleteRoom(roomid){
-  axios.delete(`http://localhost:3000/app/rooms/${roomid}`, { withCredentials: true }).then((res) => {
+  axios.delete(`http://localhost:3000/app/rooms/${roomid}`, {
+    withCredentials: true,
+    headers: {
+      'auth-token': sessionStorage.getItem("token"), // Replace with your actual token or header information
+      'Content-Type': 'application/json' // Include other headers as needed
+    }
+  }).then((res) => {
     console.log(res.data);
     window.location.reload();
   }).catch((err)=>{

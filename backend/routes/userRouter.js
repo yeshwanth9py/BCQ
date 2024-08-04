@@ -114,15 +114,21 @@ userRouter.post("/login", async (req, res)=>{
         console.log("token", token)
         
 
+        // res.cookie('token', token, {
+        //     httpOnly: false, 
+        //     secure: false, // true if your app is hosted on HTTPS
+        //     sameSite: 'lax', // true if your site uses
+        //     maxAge: 36000000, // 1 hour in milliseconds
+        // });
         res.cookie('token', token, {
-            httpOnly: false, 
-            secure: false, // true if your app is hosted on HTTPS
-            sameSite: 'lax', // true if your site uses
-            maxAge: 36000000, // 1 hour in milliseconds
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+            sameSite: 'None', // or 'strict' depending on your requirements
+            maxAge: 36000000 // 1 hour in milliseconds
         });
         console.log(udetails)
         
-        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile});
+        res.json({uid: udetails._id, username: udetails.username, profilePic: udetails.profilepic, pid: udetails.profile, token});
 
     } catch(err){
         console.log(err)
