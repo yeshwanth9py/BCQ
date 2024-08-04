@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebase/firebase';
 
@@ -72,6 +72,12 @@ const FileUpload = ({setFormdetails}) => {
     );
   };
 
+  useEffect(()=>{
+    if(!downloadURL){
+      handleUpload()
+    }
+  },[file])
+
   return (
     <div>
       <Button
@@ -87,6 +93,7 @@ const FileUpload = ({setFormdetails}) => {
       </Button>
       
       {file && !downloadURL && <div onClick={handleUpload}>Uploade your profile pic</div>}
+
       {downloadURL && <img src={downloadURL} alt="profile pic" width={100} height={100}/>}
       {(progress > 0 && progress < 100) && <div>Progress: {progress}%</div>}
       {/* {downloadURL && <a href={downloadURL} target="_blank" rel="noopener noreferrer">Download File</a>} */}

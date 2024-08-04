@@ -12,6 +12,7 @@ import Gameover from './components/Gameover/Gameover.jsx'
 import Codepage from './components/Codepage.jsx'
 import AdminControls from './components/AdminControls/AdminControls.jsx'
 import LeaderBoard from './components/Leaderboard.jsx'
+import Forgotpassword from './components/Forgotpassword.jsx'
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/home" element={<Navigate to="/" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgotpassword" element={<Forgotpassword/>}/>
         <Route path="/home/room/:id" element={<GameRoom/>}/>
         <Route path="/home/profile/:id" element = {<Profile2/>}/>
         <Route path="/game/:id" element={<Gamepage />} />

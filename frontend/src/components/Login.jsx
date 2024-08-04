@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Input } from '@mui/base/Input';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 import Loader from './Loader';
 import axios from 'axios';
@@ -42,12 +43,24 @@ const Login = () => {
             }, 1000)
         }).catch((err) => {
             console.log(err);
+            if(err?.response?.status == 400){
+                if(err.response.data.name == "ZodError"){
+                    toast.error(err.response.data.issues[0].message);
+                }else{
+                    toast.error(err.response.data.message);
+                }
+            }else{
+                console.log(err);
+                toast.error('Server error!');
+            }   
+        
         });
 
     }
 
     return (
         <div className='h-screen flex justify-center align-middle'>
+            <Toaster />
             {isloading ? (<Loader />) :
                 (
                     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 ">
@@ -118,7 +131,7 @@ const Login = () => {
 
                                 </div>
                                 <div className="text-sm">
-                                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500 text-lg">
+                                    <a href="/forgotpassword" className="font-semibold text-indigo-600 hover:text-indigo-500 text-lg">
                                         Forgot password?
                                     </a>
                                 </div>

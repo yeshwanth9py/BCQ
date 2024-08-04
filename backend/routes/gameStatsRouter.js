@@ -40,7 +40,7 @@ gameStatsRouter.get("/:id", async (req, res) => {
     }
   });
   
-
+const ranks =  ['Noob', 'Rookie', 'Guardian', 'Pro', 'Master', 'Grandmaster', 'Specialist', 'Champion', 'Legend', 'Hacker', 'Godlike'];
 
 gameStatsRouter.post("/", async (req, res) => {
     try{
@@ -83,12 +83,51 @@ gameStatsRouter.post("/", async (req, res) => {
             const pid = userd.profile;
             const profiled = await Profilemodel.findOne({_id:pid});
             profiled.previousGames.push(gameStats._id);
-            const saveddetails = await profiled.save();
+            //write here
+            console.log("profiled",profiled);
+            
+            profiled.totalpoints += req.body.data[uid].score;
+
+            profiled.totalGamesPlayed += 1;
+
+            if(tempwinner == req.body.data[uid].username){
+                profiled.totalGamesWon += 1;
+            }
+
+            profiled.winlossratio = profiled.totalGamesWon / profiled.totalGamesPlayed;
+
+            //updating the users rank
+            if(profiled.totalpoints >0 && profiled.totalpoints < 25){
+                profiled.rank = ranks[0];
+            }else if(profiled.totalpoints >= 25 && profiled.totalpoints < 50){
+                profiled.rank = ranks[1];
+            }else if(profiled.totalpoints >= 50 && profiled.totalpoints < 75){
+                profiled.rank = ranks[2];
+            }else if(profiled.totalpoints >= 75 && profiled.totalpoints < 100){
+                profiled.rank = ranks[3];
+            }else if(profiled.totalpoints >= 100 && profiled.totalpoints < 125){
+                profiled.rank = ranks[4];
+            }else if(profiled.totalpoints >= 125 && profiled.totalpoints < 150){
+                profiled.rank = ranks[5];
+            }else if(profiled.totalpoints >= 150 && profiled.totalpoints < 175){
+                profiled.rank = ranks[6];
+            }else if(profiled.totalpoints >= 175 && profiled.totalpoints < 200){
+                profiled.rank = ranks[7];
+            }else if(profiled.totalpoints >= 200 && profiled.totalpoints < 225){
+                profiled.rank = ranks[8];
+            }else if(profiled.totalpoints >= 225 && profiled.totalpoints < 250){
+                profiled.rank = ranks[9];
+            }else if(profiled.totalpoints >= 250){
+                profiled.rank = ranks[10];
+            }
+
+            await profiled.save();
+
         }
 
 
         res.json(gameStats);
-    } catch(err){
+    } catch(err) {
         console.error(err);
         return res.status(400).json(err);
     }

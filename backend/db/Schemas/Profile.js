@@ -24,6 +24,8 @@ const profileschema = new mongoose.Schema({
     },
     rank:{
         enum: ['Noob', 'Rookie', 'Guardian', 'Pro', 'Master', 'Grandmaster', 'Specialist', 'Champion', 'Legend', 'Hacker', 'Godlike'],
+            // 0,           25,      50,       75,     100,         125,      150,           175,         200,       225,         250+      
+        type: String  
     },
     email: {
         type: String,
@@ -46,7 +48,8 @@ const profileschema = new mongoose.Schema({
         // expires: '9d'
     },
     countunread: {
-        type: Number
+        type: Number,
+        default: 0
     },
     createdAt: {
         type: Date,
@@ -57,8 +60,8 @@ const profileschema = new mongoose.Schema({
         default: 0
     },
     winlossratio:{
-        type: String,
-        default: "0"
+        type: Number,
+        default: 0.0
     },
     totalGamesPlayed:{
         type: Number,

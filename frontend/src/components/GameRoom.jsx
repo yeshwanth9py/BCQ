@@ -1,12 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Usercomponent from './Waitingroom.jsx/Usercomponent';
 import { io } from 'socket.io-client';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { pink } from '@mui/material/colors';
 import axios from "axios";
+import shareIcon from "../assets/shareIcon.png";
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 import logo from "../assets/exit_12.png";
+import Logo from './Logo';
 
 const GameRoom = () => {
   const params = useParams();
@@ -24,6 +27,21 @@ const GameRoom = () => {
   const [messages, setMessages] = useState([]);
 
   const [chatExpanded, setChatExpanded] = useState(true);
+  const [maxPlayers, setMaxPlayers] = useState(2);
+  const [category, setCategory] = useState("ALL");
+  const [timeLimit, setTimeLimit] = useState(60);
+  const [gameType, setGameType] = useState("MCQ BATTLE");
+  const [copy, setCopy] = useState("Copy Url");
+  const [showModel, setShowModel] = useState(false);
+
+  const modalRef = useRef(null); 
+
+  const shareOnWhatsApp = () => {
+
+    const whatsappMessage = `Join my room on CodeCombat: ${window.location.href}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
 
   const navbarStyle = {
@@ -67,6 +85,8 @@ const GameRoom = () => {
       console.log(Object.keys(data));
       setUserids(Object.keys(data));
       setAllusers(data);
+      setCtr(0);
+      setIsReady(false);
     });
 
     socket.on("readyb", (data) => {
@@ -108,10 +128,52 @@ const GameRoom = () => {
       return () => clearInterval(timer);
     }
 
-    // return ()=>{
-    //   exitroom();
-    // }
+    return ()=>{
+      console.log(window.location);
+      // exitroom();
+    }
   }, [ctr]);
+
+  useEffect(()=>{
+    async function getroomdata(){
+      await axios.get("http://localhost:3000/app/rooms/"+params.id).then((res)=>{
+        console.log("room data:",res.data);
+        setMaxPlayers(res.data.room.numPlayers);
+        setCategory(res.data.room.categories==""?"ALL":res.data.room.categories);
+        setTimeLimit(res.data.room.timeLimit);
+        setGameType(res.data.room.gameType);
+      })
+      .catch((err)=>{
+        console.log(err);
+        alert("room does not exist");
+        navigate("/home");
+      })
+    }
+
+    getroomdata();
+  }, [])
+
+  
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) { 
+      setShowModel(false);
+      setCopy("Copy Url");
+    }
+  };
+
+  useEffect(() => {
+    console.log(showModel)
+    if (showModel) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showModel]);
+
 
   const gamedetails = ["Solo", "Duo", "Trio", "Quartet", "Quintet", "Sextet", "Septet", "Octet"];
 
@@ -152,23 +214,50 @@ const GameRoom = () => {
     }
   };
 
+  
+
   return (
+    <>
+    <mymodel className={`w-screen h-screen absolute z-10 flex justify-center items-center bg-[rgba(0,0,0,0.5)] ${showModel ? "block" : "hidden"}`}>
+      <div className='w-1/3 h-1/3 bg-white p-5 rounded-lg text-center flex flex-col items-center' ref={modalRef}>
+        <Logo />
+        <hr className="bg-black my-2"/>
+
+        <div className="bg-black text-white rounded-lg w-fit p-2 mt-4 hover:bg-red-700 cursor-pointer hover:scale-110" 
+        onClick={(e)=>{
+          navigator.clipboard.writeText("window.location.href").then(()=>{
+            setCopy("Copied!");
+            // e.target.className = "bg-red-700 rounded-lg w-fit p-2 mt-4 hover:bg-red-700 cursor-pointer hover:scale-110"
+          })
+        }}>{copy}</div>
+
+        <div className='my-2 font-semibold text-xl'>or</div>
+        <WhatsAppIcon className='cursor-pointer scale-150 hover:scale-[2] mt-1' onClick={shareOnWhatsApp}/>
+      </div>
+      
+    </mymodel>
     <div className='animated-gradient bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 h-screen flex flex-col items-center justify-center relative'>
       <nav style={navbarStyle}>
-        <p className='text-center text-slate-200 py-2'>
+        <p className='text-center text-slate-200 pt-5'>
           {alluserids.length <= 1 ? "You Can Not Start The Game When No Other Players Are Present" : "Press Ready To Start The Game"}
           <br />
-          or just Wait For Other Players To Join...
         </p>
       </nav>
-      <div className="absolute top-16 left-0 right-0 z-10 bg-red-700 w-1/5 mx-auto flex justify-center items-center text-3xl p-2 rounded-lg shadow-lg cursor-pointer" style={{ height: "10vh" }}>
+      <div className="absolute top-16 left-0 right-0 z-10 bg-red-700 w-1/5 mx-auto flex justify-center items-center text-3xl p-2 rounded-lg shadow-lg cursor-pointer font-semibold" style={{ height: "10vh" }}>
         {gamedetails[alluserids.length - 1]}
       </div>
-      <div className='text-slate-200 text-right px-6 text-xl my-7 absolute top-24 right-0'>
-        {console.log(allusers)}
-        Min no of players - 2
-        <br />
-        Max no of players - 8
+      <div className='text-white px-8 text-xl my-7 absolute top-24 right-8 flex flex-col items-start cursor-pointer border-2 py-2 border-black rounded-lg font-bold bg-black hover:scale-105'>
+      <span>{gameType}</span>
+        <span>Category: {category}</span>
+        
+        <span>Total Players - {alluserids.length}</span>
+        
+        <span>Min no of players - 2</span>
+        
+        <span>Max no of players - {maxPlayers}</span>
+
+        <span>Timelimit-{timeLimit} sec</span>
+        
       </div>
       <div className='flex justify-evenly mt-20 w-full px-20'>
         {alluserids.map((userid, index) => (
@@ -176,7 +265,7 @@ const GameRoom = () => {
         ))}
       </div>
       {disabletn ? (
-        <div className='w-screen h-screen text-center mt-auto text-6xl text-slate-200'>
+        <div className='w-screen h-screen text-center mt-auto text-6xl text-slate-200 fixed z-50 bg-transparent top-[20%]'>
           {smalltimer}
         </div>
       ) : (
@@ -219,8 +308,10 @@ const GameRoom = () => {
         </div>
       </div>
 
-      <img src={logo} width="100" height="100" className='absolute bottom-7 right-7 hover:scale-125 cursor-pointer' onClick={exitroom} />
+      <img src={logo} width="100" height="100" className='absolute top-20 z-20 left-12 hover:scale-125 cursor-pointer' onClick={exitroom} />
+      <img src={shareIcon} className='absolute bottom-10 right-14 hover:scale-125 cursor-pointer w-20 rounded-xl' onClick={()=>setShowModel(true)}/>
     </div>
+    </>
   );
 };
 

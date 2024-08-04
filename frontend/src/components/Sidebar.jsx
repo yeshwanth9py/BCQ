@@ -25,6 +25,7 @@ const menuItems = [
 const Sidebar = ({setChats}) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  {console.log("name", localStorage.getItem("ccusername"))}
 
   useEffect(() => {
     setTimeout(() => {
@@ -67,13 +68,13 @@ const Sidebar = ({setChats}) => {
               </div>
             </li>
           ))}
-          <span className="text-white hover:text-xl text-center mx-auto ml-3 cursor-pointer" onClick={()=>setChats((prev)=>!prev)}><FontAwesomeIcon className={"sidebar__icon"} icon={faCloud} /><span className={`${!isOpen?"hidden":""}`}>chats</span></span>
-        </ul>
-      </div>
-      
+            <span className="text-white hover:text-xl text-center mx-auto ml-3 cursor-pointer hover:text-black" onClick={()=>setChats((prev)=>!prev)}><FontAwesomeIcon className={"sidebar__icon"} icon={faCloud} /><span className={`${!isOpen?"hidden":""}`}>Chats</span></span>
+          </ul>
+        </div>
+        
       <div className="w-full h-0.5 bg-white"></div>
-      <div className="sidebar__logout text-center" onClick={handleLogout}>
-        <FontAwesomeIcon className={"sidebar__icon"} icon={faSignOutAlt} />
+      <div className="sidebar__logout text-center text-white" onClick={handleLogout}>
+        <FontAwesomeIcon className={"sidebar__icon mt-1"} icon={faSignOutAlt} />
         <CSSTransition
           in={isOpen}
           timeout={100}

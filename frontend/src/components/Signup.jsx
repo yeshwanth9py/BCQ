@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Loader from './Loader';
 import FileUpload from './FileInput';
 import { toast, ToastContainer } from 'react-toastify';
+import toast2, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -34,9 +35,8 @@ const Signup = () => {
     console.log(formdetails);
     if (formdetails.password !== formdetails.confirmPassword) {
       console.log("not ame")
-      toast.error("Passwords do not match!", {
-        position: "bottom-right"
-      });
+      toast2.error("Passwords do not match!");
+      
     }
     try{
       const details = await axios.post("http://localhost:3000/app/user/signup", formdetails);
@@ -60,12 +60,23 @@ const Signup = () => {
       
     } catch(err){
       console.log(err);
+      if(err?.response?.status == 400){
+        if(err.response.data.name == "ZodError"){
+          toast2.error(err.response.data.issues[0].message);
+        }else{
+          toast.error(err.response.data.message);
+        }
+      }else{
+        console.log(err);
+        toast.error('Server error!');
+      }
     }
     
   }
 
   return (
     <div className='h-screen flex justify-center align-middle'>
+      <Toaster/>
       {isloading ? (<Loader />) :
         (
           <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 ">
@@ -134,13 +145,13 @@ const Signup = () => {
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="block text-lg font-medium leading-6 text-gray-900">
+                    <label htmlFor="passsword" className="block text-lg font-medium leading-6 text-gray-900">
                       Confirm Password
                     </label>
                   </div>
                   <div className="mt-2">
                     <input
-                      id="password"
+                      id="passsword"
                       name="password"
                       type="password"
                       autoComplete="current-password"

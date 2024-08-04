@@ -156,7 +156,7 @@ roomRouter.get("/quickmatch", async (req, res) => {
             const roomd = await axios.post("http://localhost:3000/app/rooms/create", {
                 roomName: `${roomNames[Math.floor(Math.random() * roomNames.length)]}`,
                 gameType: "Quick match",
-                timeLimit: 160,
+                timeLimit: 100,
                 Status: "open to anyone",
                 CreatedBy: "Quick match",
             }, {
@@ -216,6 +216,10 @@ roomRouter.post("/exitroom", auth, async (req, res) => {
         return res.json({ message: "Room exited successfully", room });
     }
     room.members.pop(req.userd._id)
+    if(room.members.length == 0) {
+        // const updatedRoom = await Room.findByIdAndUpdate(roomId, { ingame: false }, { new: true });
+        room.ingame = false
+    }
     try {
         await room.save();
         return res.json({ message: "Room exited successfully", room });

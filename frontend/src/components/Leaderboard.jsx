@@ -17,10 +17,10 @@ export default function Leaderboard() {
 
   useEffect(() => {
     async function fetchData() {
-      const profdata = await axios.get("http://localhost:3000/app/profile/");
+      let profdata = await axios.get("http://localhost:3000/app/profile/");
       console.log(profdata);
+      profdata.data.sort((a, b) => b.totalpoints - a.totalpoints);
       setProfiles(profdata.data);
-      
     }
 
     fetchData();
@@ -44,7 +44,7 @@ export default function Leaderboard() {
               key={index}
               className={`bg-white bg-opacity-20 backdrop-blur-lg p-6 rounded-lg shadow-xl transition-transform transform ${
                 index === 0 ? 'scale-105' : 'hover:scale-105'
-              }`}
+              }`} onClick={() => navigate(`/home/profile/${pro.username}`)}
             >
               <div className="flex flex-col items-center cursor-pointer">
                 <img
@@ -54,7 +54,7 @@ export default function Leaderboard() {
                 />
                 {index === 0 && <FaCrown className="text-yellow-400 text-4xl mb-2 animate-bounce" />}
                 <h2 className="text-3xl font-bold text-white">{pro.username}</h2>
-                <p className="text-lg text-white text-opacity-80">Rank: {"pro.rank"}</p>
+                <p className="text-lg text-white text-opacity-80">Rank: {pro.rank}</p>
                 <p className="text-lg text-white text-opacity-80">Points: {pro.totalpoints}</p>
                 <p className="text-lg text-white text-opacity-80">Win/Loss Ratio: {pro.winlossratio}</p>
                 <p className="text-lg text-white text-opacity-80">Games Played: {pro.totalGamesPlayed}</p>

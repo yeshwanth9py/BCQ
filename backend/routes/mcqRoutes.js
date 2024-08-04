@@ -34,12 +34,18 @@ mcqRouter.get("/getrandom", async (req, res)=>{
 mcqRouter.get("/category", async (req, res)=>{
     const { category } = req.query;
     try{
-        const mcq = await MCQ.find({category: category});
+        console.log("category", category);
+        // const mcq = await MCQ.findOne({category: category});
+        const mcq = await MCQ.aggregate([
+            { $match: { category: category } },
+            { $sample: { size: 1 } }
+          ]);
+        const randomMCQ = mcq[0];
         return res.json({
-            id: mcq._id,
-            question: mcq.question,
-            options: mcq.options,
-            category: mcq.category
+            id: randomMCQ._id,
+            question: randomMCQ.question,
+            options: randomMCQ.options,
+            category: randomMCQ.category
         });
     } catch(err){
         console.error(err);

@@ -10,7 +10,7 @@ const  Profile  = require("../db/Schemas/Profile");
 
 
 const userSchema = z.object({
-    username: z.string().nonempty("Username is required").regex(/^[a-zA-Z0-9_]+$/, "Username must be alphanumeric and can include underscores"),
+    username: z.string().nonempty("Username is required").regex(/^[a-zA-Z0-9_]+$/, "Username must be alphanumeric and can only include underscores"),
     password: z.string().min(8, "Password must be at least 8 characters long"),
     email: z.string().email("Invalid email address"),
     confirmPassword: z.string().min(8, "Password must be at least 8 characters long").optional(),
@@ -81,7 +81,7 @@ userRouter.post("/signup", async (req, res)=>{
         res.json({uid: udetails._id, username: udetails.username, pid: pdetails._id, profilepic: udetails.profilepic});
     } catch(err){
         res.status(400).json({
-            msg: "some error signing up"
+            msg: "some error signing up please try again later"
         });
     }
 });
@@ -133,7 +133,7 @@ userRouter.post("/login", async (req, res)=>{
     } catch(err){
         console.log(err)
         res.status(400).json({
-            msg: "some error logging in"
+            msg: "some error logging in please try again later"
         });
     }
 })

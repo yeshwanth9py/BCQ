@@ -123,6 +123,12 @@ io.on("connection", (socket) => {
             }
         };
 
+        for(let uid in allwaitingrooms[data.roomno]){
+            allwaitingrooms[data.roomno][uid].isReady = false;
+        }
+
+        
+
         socket.join(data.roomno);
         // setExpiry(data.roomno, "allwaitingrooms");
 

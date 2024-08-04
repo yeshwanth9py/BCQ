@@ -101,6 +101,7 @@ const Home = () => {
     console.log("profile", data[0]);
     // localStorage.setItem("ccprofilepic", data[0].profilePic);
     // setMessages(data[0].messages);
+    localStorage.setItem("ccavatar", data[0].profilePic);
     setChallengeNotifications([...data[0].notifications]);
     setUnreadchallenges(data[0].countunread);
   }

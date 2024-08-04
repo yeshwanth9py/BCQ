@@ -10,8 +10,13 @@ const Gameover = () => {
     const [data, setData] = useState([]);
 
     const navigate = useNavigate();
-    const location = useLocation();
-    const { state } = location;
+    // const location = useLocation();
+    // const { state } = location;
+    const [state, setState] = useState({prevdata:JSON.parse(sessionStorage.getItem("prevdata"))});
+
+
+    // const state = JSON.parse(sessionStorage.getItem("prevdata")) || [];
+
 
     useEffect(() => {
         axios.get(`http://localhost:5000/app/gameover/${params.id}`).then((res) => {
@@ -40,6 +45,7 @@ const Gameover = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        {console.log("data", data)}
                         {data.map((item, index) => (
                             <tr key={index} className={index % 2 === 0 ? 'bg-gray-100' : 'bg-gray-50'}>
                                 <td className="px-4 py-2 text-center">{index + 1}</td>
@@ -49,7 +55,7 @@ const Gameover = () => {
                                 <td className="px-4 py-2 text-center">{item.score}</td>
                                 <td className="px-4 py-2 text-center">{item.attempted - item.score}</td>
                                 <td className="px-4 py-2 text-center">{item.timeTaken}</td>
-                                <td className="px-4 py-2 text-center">{new Date(item.date).toLocaleDateString()}</td>
+                                <td className="px-4 py-2 text-center">{new Date(Date.now()).toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>
