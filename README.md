@@ -47,6 +47,10 @@ Code Combat is an application where users can engage in live MCQ battles and liv
 - The back end uses child processes to handle code execution.
 - Polling is used to check the status of code execution.
 
+### Code Combat (GYM)
+- Users can solve coding problems randomly in either of the 2 languages c++ or python
+- This is a small sample of how live coding battle will happen
+
 ## Technical Details
 - The application uses three servers: front end, back end, and socket server.
 - The coding battle feature will be integrated with a dedicated code socket server once completed.
