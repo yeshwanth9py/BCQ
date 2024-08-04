@@ -46,7 +46,7 @@ const Sidebar = ({setChats}) => {
   };
 
   return (
-    <div className="h-screen flex flex-col" style={{ backgroundColor: "rgb(155,41,211)" }}>
+    <div className="min-h-screen flex flex-col flex-grow-[30]" style={{ backgroundColor: "rgb(155,41,211)" }}>
       <div className={cx("sidebar", { "sidebar-closed": !isOpen })} style={{ flexGrow: 1 }}>
         <button className={"sidebar__button"} onClick={() => setIsOpen(!isOpen)}>
           <FontAwesomeIcon icon={faBars} className="text-center"/>
