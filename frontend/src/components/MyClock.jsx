@@ -186,6 +186,15 @@ export default function MyClock() {
     setCorrect(correct + 1);
   }
 
+  function updatescore2(){
+
+    setAttempted((prevAttempted) => {
+      socket.emit("updatescore", { score: score, ccuid: localStorage.getItem("ccuid"), roomno, attempted: prevAttempted+1, correct: correct });
+      return prevAttempted + 1
+    });
+
+  }
+
   function decrementTime() {
     setSeconds(seconds => {
       if (seconds === 0) {
@@ -231,6 +240,7 @@ export default function MyClock() {
         updatescore();
       } else {
         e.target.className = "bg-red-500 rounded-lg m-4 cursor-pointer p-4";
+        updatescore2()
       }
 
       

@@ -36,7 +36,7 @@ const roomSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    index: { expires: '2d' } 
+    index: { expires: '15m' } 
   },
   no_of_ready:{
     type: Number,
