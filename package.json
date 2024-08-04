@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@mui/styles": "^5.16.5",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "crypto": "^1.0.1",
+    "nodemailer": "^6.9.14"
   },
   "name": "bcq",
   "description": "Battle Choice Question",

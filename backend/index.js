@@ -13,6 +13,7 @@ const roomRouter = require("./routes/roomRoute");
 const gameStatsRouter = require("./routes/gameStatsRouter");
 const profileRouter = require("./routes/profileRoutes");
 const codeCombatRouter = require("./routes/codeCombatRouter");
+const resetPasswordRouter = require("./routes/resetPasswordRouter");
 
 
 
@@ -41,7 +42,7 @@ const apiLimiter = rateLimit({
 
 
 
-// currently commenting the rate limiter, dont even know why have i used it :(
+// currently commenting the rate limiter, will uncomment it later
 // app.use('/api/', apiLimiter);
 
 
@@ -53,7 +54,7 @@ app.use("/app/profile", profileRouter);
 
 app.use("/app/codecombat", codeCombatRouter);
 
-
+app.use("/api", resetPasswordRouter);
 
 // error handling middleware
 app.use((err, req, res, next) => {
