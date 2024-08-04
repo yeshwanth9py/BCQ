@@ -88,7 +88,7 @@ To run the application locally, follow these steps:
 ## Feedback
 If you have any suggestions or feedback, please feel free to open an issue or contact me directly.
 
-Mail:- yeshwanthsai200*gmail.com
+Mail:- yeshwanthsai2008@gmail.com
 Phone:+91 9063299400
 
 
