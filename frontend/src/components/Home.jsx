@@ -260,7 +260,7 @@ const Home = () => {
   return (
     <>
       <BasicModal open={showModal} handleClose={handleCloseModal} />
-      <div className='flex'>
+      <div className='flex max-h-screen min-w-screen m-0 overflow-hidden'>
         <div>
           <Sidebar setChats={setChats} />
         </div>
@@ -288,7 +288,7 @@ const Home = () => {
             </div>
             <div className='m-10'>
               <h1 className='text-2xl font-bold underline-offset-4 mb-2'>Join An Existing Room:-</h1>
-              <div className="max-h-[80vh] overflow-y-auto grid grid-cols-2 gap-4">
+              <div className="max-h-[70vh] grid grid-cols-2 gap-4 overflow-y-scroll">
                 {rooms.length == 0 && <p className='text-center mt-10'>No rooms available currently, no worries you can create one :)</p>}
                 {filterrooms && filterrooms.map((room, ind) => (
                   <MultiActionAreaCard key={ind} room={room} joinRoom={joinRoom} setpasswordentered={setpasswordentered} />

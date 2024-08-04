@@ -29,6 +29,8 @@ const Login = () => {
         axios.post("http://localhost:3000/app/user/login", formdetails, { withCredentials: true }).then((res) => {
             console.log("res", res.data);
 
+            setisloading(true);
+
             localStorage.setItem("ccuid", res.data.uid);
             localStorage.setItem("ccusername", res.data.username);
             localStorage.setItem("ccavatar", res.data.profilePic);
@@ -36,7 +38,7 @@ const Login = () => {
 
             sessionStorage.setItem("token", res.data.token);
             
-            setisloading(true);
+            
         }).then((res) => {
             setTimeout(() => {
                 navigate("/home");

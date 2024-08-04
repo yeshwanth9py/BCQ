@@ -274,7 +274,7 @@ const Profile2 = () => {
               />
 
               {display && (
-                <div className='absolute top-24 right-44 rounded-lg outline-none px-2 py-1 border-2 border-gray-300 shadow-slate-900 shadow-md bg-slate-400 w-[12.6rem]'>
+                <div className='absolute top-24 right-44 rounded-lg outline-none px-2 py-1 border-2 border-gray-300 shadow-slate-900 shadow-md bg-slate-400 w-[12.6rem] overflow-y-auto'>
                   {searchResults?.length > 0 ? (
                     searchResults?.map((result, index) => (
                       <div key={index} className='py-1 px-2 border-b border-gray-300'>
@@ -284,7 +284,7 @@ const Profile2 = () => {
                           navigate(`/home/profile/` + result.username);
                           window.location.reload();
                         }}
-                        ><img src={result.profilePic} width={30} height={30} className='rounded-full' /> {result.username}</div>
+                        ><img src={result.profilePic} className='w-8 h-8 rounded-full border-2 border-gray-300 hover:scale-110 cursor-pointer' /> {result.username}</div>
                       </div>
                     ))
                   ) : (
@@ -298,12 +298,12 @@ const Profile2 = () => {
               <img
                 src={profile.profilePic || "https://via.placeholder.com/200"}
                 alt="Profile"
-                className="w-32 h-32 rounded-full border-4 border-white"
+                className="w-32 h-32 rounded-full border-4 border-white hover:scale-110 cursor-pointer"
               />
               <div className="ml-6">
                 <h1 className="text-3xl font-bold">{profile.username}{localStorage.getItem("ccusername") == profile.username ? " (You)" : ""}</h1>
                 <div className="flex items-center mt-2">
-                  <p className="mr-4">Rank: {user.profile || "Guardian"}</p>
+                  <p className="mr-4">Rank: {profile.rank || "Noob"}</p>
                   <p className="px-2 flex gap-1 items-center">
                     {likeCount || 0}
                     {!liked ? (
@@ -329,11 +329,14 @@ const Profile2 = () => {
               <FaArrowLeft className='fixed top-[50%] left-1 text-xl cursor-pointer bg-black rounded-full w-28 h-16 hover:scale-105' onClick={()=>{navigate(-1)}}/>
             </div>
             <div className="p-6 bg-gray-100"> 
-              <div className="flex justify-between mb-4">
-                <p>{followCount || 0} followers</p>
-                <p>{profile.following.length || 0} following</p>
+              <div className="flex justify-between mb-4 mx-2">
+                <p className='font-semibold'>{followCount || 0} followers</p>
+                <p className='font-semibold'>{profile.following.length || 0} following</p>
               </div>
-              <p className="mb-4">{profile.bio || "hi it's me"}</p>
+              <div className='mx-2'>
+                Bio:
+                <p className="mb-4">{profile.bio || "hi it's me"}</p>
+              </div>
             </div>
           </div>
 
@@ -342,9 +345,9 @@ const Profile2 = () => {
           <h1 className="text-center text-4xl mt-10 mb-6 font-semibold">Previous Game Stats</h1>
 
           <div className="bg-white p-6 rounded-lg shadow-lg mb-8 flex justify-around text-lg">
-            <h1>Win/Loss ratio: {user.winLossRatio || 0}</h1>
-            <h1>Total Games Played: {user.totalGamesPlayed || 0}</h1>
-            <h1>Total Games Won: {user.totalGamesLost || 0}</h1>
+            <h1>Win/Loss ratio: {profile.winlossratio || 0}</h1>
+            <h1>Total Games Played: {profile.totalGamesPlayed || 0}</h1>
+            <h1>Total Games Won: {profile.totalGamesWon || 0}</h1>
           </div>
 
 
