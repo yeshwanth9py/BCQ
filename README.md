@@ -1,7 +1,7 @@
 # BCQ
-Battle Choice Question(V1)
+Battle Choice Question (V1)
 
-# Code Combat(V2)
+# Code Combat (V2)
 
 Code Combat is an application where users can engage in live MCQ battles and live coding battles. This README provides an overview of the application's features and how it works.
 
@@ -12,6 +12,7 @@ Code Combat is an application where users can engage in live MCQ battles and liv
 - The application redirects users to the login page if they are not authenticated.
 - The sign-up page allows users to select and upload a profile picture, which is stored in Firebase along with other user details.
 - Forgot password feature with error validation is available for users who need to reset their passwords.
+- Users who forgot their password can receive OTPs via email to reset their passwords.
 
 ### Room Management
 - Available rooms are displayed with an expiration time to ensure data is cleared periodically.
@@ -34,6 +35,7 @@ Code Combat is an application where users can engage in live MCQ battles and liv
 - User profiles display game history with pagination to load data efficiently.
 - Users can follow others and view their profiles.
 - Users can challenge others to a game, which triggers a push notification for the recipient.
+- Ranking system: Users are assigned ranks based on their points. Ranks include Noob, Rookie, Guardian, Pro, Master, Grandmaster, Specialist, Champion, Legend, Hacker, and Godlike (0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250+ points).
 
 ### In-Room and Global Chat
 - Users in the same room can chat with each other.
@@ -88,12 +90,7 @@ To run the application locally, follow these steps:
 ## Feedback
 If you have any suggestions or feedback, please feel free to open an issue or contact me directly.
 
-Mail:- yeshwanthsai2008@gmail.com
-Phone:+91 9063299400
-
-
+Mail: yeshwanthsai2008@gmail.com  
+Phone: +91 9063299400
 
 Thank you for checking out Code Combat!
-
-
-
