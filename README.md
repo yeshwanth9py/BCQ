@@ -3,7 +3,7 @@ Battle Choice Question (V1)
 
 # Code Combat (V2)
 
-Code Combat is an application where users can engage in live MCQ battles and live coding battles. This README provides an overview of the application's features and how it works.
+Code Combat is an application where users can engage in live CODING/MCQ battles. This README provides an overview of the application's features and how it works.
 
 ## Main Features
 
@@ -13,13 +13,6 @@ Code Combat is an application where users can engage in live MCQ battles and liv
 - The sign-up page allows users to select and upload a profile picture, which is stored in Firebase along with other user details.
 - Forgot password feature with error validation is available for users who need to reset their passwords.
 - Users who forgot their password can receive OTPs via email to reset their passwords.
-
-### Room Management
-- Available rooms are displayed with an expiration time to ensure data is cleared periodically.
-- Users can create rooms with customizable settings, such as game type (MCQ battle or coding battle), number of players, time limit, difficulty level, and room password.
-- Room creators can delete their rooms, and other users need to be accepted by the room owner to join.
-- The room owner must accept join requests from other users.
-- Rooms can be shared via WhatsApp for easy invitations.
 
 ### Live MCQ Battles
 - Users can participate in MCQ battles with a live leaderboard displayed during the game.
@@ -42,10 +35,16 @@ Code Combat is an application where users can engage in live MCQ battles and liv
 - A global chat feature allows users to communicate and challenge each other from the home session.
 
 ### Live Coding Battles (Under Construction)
-- Users will receive random coding problems to solve within a time limit.
-- The front end uses the Monaco Editor.
-- The back end uses child processes to handle code execution.
-- Polling is used to check the status of code execution.
+- All the Users present in game room will receive random coding problems to solve within a time limit.
+- If the user is able to solve the problem (passing all the testcases) he will gain 5 points and will be given a new question thereafter.
+- The user is also allowed to skip 3 questions in a given game, if he is unable to solve it.
+- At the end of the game the user who has most points will be the winner of the game, this data/game stats will be reflected in the gamers profile in about 10 minutes buffer.
+
+### Room management
+- Users can create rooms with customizable settings, such as game type (CODING battle or MCQ battle), number of players, time limit, difficulty level, and room password.
+- Users can basically make their rooms private(with a password) or public(open for anyone to join) and share the invites with their friends (through whatsapp)
+- Users can also visit an other user and challenge him directly through the profile, this will send a real time request or a push notification to the other user
+- Any person joining the room(uninvited) will have to wait for the current room owner to accept him in nor he can not join
 
 ### Code Combat (GYM)
 - Users can solve coding problems randomly in either of the 2 languages c++ or python
@@ -55,7 +54,8 @@ Code Combat is an application where users can engage in live MCQ battles and liv
 - The application uses three servers: front end, back end, and socket server.
 - The coding battle feature will be integrated with a dedicated code socket server once completed.
 
-### Quick Match
+### Quick Match Feature
+- Fed up with the time consuming protected rooms and strict owners who wont accept you in? no worries.
 - Users can join available rooms or create a new room if no rooms are available.
 - The quick match feature allows users to enter a game without needing approval from the room owner.
 
